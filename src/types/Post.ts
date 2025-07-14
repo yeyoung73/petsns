@@ -7,4 +7,5 @@ export interface Post {
   username: string;
   tags?: string[];
   is_deleted?: boolean;
+  profile_image: string;
 }

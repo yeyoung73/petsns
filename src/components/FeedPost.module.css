@@ -116,3 +116,19 @@
 .reportButton:hover {
   background-color: #fee2e2;
 }
+
+.userInfo {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.profileImage {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #ddd;
+  cursor: pointer;
+}

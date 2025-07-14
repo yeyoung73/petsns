@@ -59,7 +59,14 @@ const FeedPost: React.FC<Props> = ({ post, onTagClick }) => {
 
   return (
     <div className={styles.feedPost}>
-      <div className={styles.username}>
+      <div className={styles.userInfo}>
+        <Link to={`/users/${post.user_id}`}>
+          <img
+            src={getImageUrl(post.profile_image)}
+            alt={`${post.username}의 프로필 이미지`}
+            className={styles.profileImage}
+          />
+        </Link>
         <Link to={`/users/${post.user_id}`} className={styles.usernameLink}>
           {post.username}
         </Link>

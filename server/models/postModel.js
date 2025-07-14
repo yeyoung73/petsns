@@ -45,7 +45,7 @@ export const createPost = async ({ userId, content, image, tags }) => {
 
 export async function getAllPosts(userId) {
   const { rows } = await db.query(
-    `SELECT p.post_id, p.user_id, u.username, p.content, p.image, p.created_at, p.is_deleted,
+    `SELECT p.post_id, p.user_id, u.username, u.profile_image, p.content, p.image, p.created_at, p.is_deleted,
             COALESCE(l.like_count,0) AS like_count,
             COALESCE(c.comment_count,0) AS comment_count,
             ARRAY_REMOVE(ARRAY_AGG(t.name), NULL) AS tags
@@ -62,7 +62,7 @@ LEFT JOIN petsns.tags t ON pt.tag_id = t.tag_id
 WHERE p.user_id NOT IN (
   SELECT blocked_id FROM petsns.blocks WHERE blocker_id = $1
 )
-GROUP BY p.post_id, u.username, l.like_count, c.comment_count, p.is_deleted
+GROUP BY p.post_id, u.username, u.profile_image, l.like_count, c.comment_count, p.is_deleted
 ORDER BY p.created_at DESC`,
     [userId]
   );
@@ -71,7 +71,7 @@ ORDER BY p.created_at DESC`,
 
 export async function getPostById(postId, currentUserId) {
   const { rows } = await db.query(
-    `SELECT p.post_id, p.user_id, u.username, p.content, p.image, p.created_at, p.is_deleted,
+    `SELECT p.post_id, p.user_id, u.username, u.profile_image, p.content, p.image, p.created_at, p.is_deleted,
             COALESCE(l.like_count,0) AS like_count,
             COALESCE(c.comment_count,0) AS comment_count,
             ARRAY_REMOVE(ARRAY_AGG(t.name), NULL) AS tags
@@ -89,7 +89,7 @@ WHERE p.post_id = $1
   AND p.user_id NOT IN (
     SELECT blocked_id FROM petsns.blocks WHERE blocker_id = $2
   )
-GROUP BY p.post_id, u.username, l.like_count, c.comment_count`,
+GROUP BY p.post_id, u.username, u.profile_image, l.like_count, c.comment_count`,
     [postId, currentUserId]
   );
 

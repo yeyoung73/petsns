@@ -109,12 +109,23 @@ const PostDetailPage: React.FC = () => {
     <div className={styles.pageContainer}>
       <div className={styles.header}>
         <div>
-          <span className={styles.authorInfo}>
-            작성자:{" "}
-            <Link to={`/users/${post.user_id}`} className={styles.authorLink}>
-              {post.username}
+          <div className={styles.authorInfo}>
+            <Link
+              to={`/users/${post.user_id}`}
+              className={styles.authorProfile}
+            >
+              <img
+                src={getImageUrl(post.profile_image)}
+                alt={`${post.username}의 프로필 이미지`}
+                className={styles.profileImage}
+                onError={(e) => {
+                  e.currentTarget.src = "/default-profile.png"; // 실패 시 대체 이미지
+                }}
+              />
+              <span className={styles.authorName}>{post.username}</span>
             </Link>
-          </span>
+          </div>
+
           {followTargetId && (
             <button
               onClick={toggleFollow}

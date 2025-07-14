@@ -170,3 +170,27 @@
 .backButton:hover {
   background-color: #9ca3af;
 }
+
+.authorProfile {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-decoration: none;
+}
+
+.profileImage {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 1px solid #ccc;
+}
+
+.authorName {
+  font-weight: bold;
+  color: #1f2937;
+}
+
+.authorName:hover {
+  text-decoration: underline;
+}
