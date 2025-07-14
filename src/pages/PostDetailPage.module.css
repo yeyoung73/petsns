@@ -1,38 +1,57 @@
 .pageContainer {
-  padding: 1.5rem;
+  padding: 2rem;
   max-width: 800px;
-  margin: 0 auto;
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+  margin: 2rem auto;
+  background-color: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
 }
 
 .header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 1rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
 }
 
 .authorInfo {
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: #1f2937;
+}
+
+.authorLink {
+  color: #3b82f6;
+  text-decoration: none;
   font-weight: bold;
+}
+
+.authorLink:hover {
+  text-decoration: underline;
 }
 
 .timestamp {
-  margin-left: 1rem;
-  font-size: 0.85rem;
-  color: #666;
+  display: block;
+  font-size: 0.8rem;
+  color: #6b7280;
+  margin-top: 4px;
+}
+
+.actionButtons {
+  display: flex;
+  gap: 0.5rem;
 }
 
 .actionButtons button {
-  margin-left: 0.5rem;
   background-color: #4f46e5;
   color: white;
   border: none;
-  padding: 0.4rem 0.8rem;
-  border-radius: 6px;
-  font-weight: bold;
+  padding: 0.4rem 0.9rem;
+  border-radius: 8px;
+  font-weight: 600;
   cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
 .actionButtons button:hover {
@@ -40,88 +59,114 @@
 }
 
 .imageWrapper {
-  margin-bottom: 1rem;
   text-align: center;
+  margin-bottom: 1.5rem;
 }
 
 .imageWrapper img {
   max-width: 100%;
-  border-radius: 8px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
 }
 
 .content {
   margin-bottom: 2rem;
-  line-height: 1.6;
-  white-space: pre-wrap;
   font-size: 1rem;
-  color: #333;
+  color: #374151;
+  line-height: 1.7;
+  white-space: pre-wrap;
 }
 
-.centeredMessage {
-  padding: 1rem;
-  text-align: center;
-}
-
-.error {
-  color: red;
-}
-
-.backButton {
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
   margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  background-color: #ccc;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
 }
 
-.likeButton {
-  margin-top: 8px;
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 18px;
-  color: #e91e63;
+.tag {
+  background-color: #f3f4f6;
+  color: #1f2937;
+  padding: 0.4rem 0.8rem;
+  border-radius: 9999px;
+  font-size: 0.85rem;
+  cursor: default;
 }
 
 .likeWrapper {
-  margin-top: 12px;
+  margin-top: 1rem;
+}
+
+.likeButton {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: #e11d48;
+  transition: transform 0.1s ease;
+}
+
+.likeButton:hover {
+  transform: scale(1.05);
 }
 
 .followButton {
   margin-left: 10px;
-  padding: 4px 10px;
+  padding: 0.4rem 0.9rem;
   border: none;
   border-radius: 6px;
+  font-weight: 600;
+  font-size: 0.85rem;
   cursor: pointer;
-  font-weight: bold;
-  font-size: 0.9rem;
   transition: background-color 0.2s ease;
 }
 
-/* 팔로우 전 - 강조된 색 */
 .followingFalse {
   background-color: #4f46e5;
   color: white;
 }
 
-/* 팔로우 후 - 중립적인 회색 */
 .followingTrue {
   background-color: #e5e7eb;
-  color: #333;
+  color: #374151;
 }
 
-.tags {
-  margin-top: 1rem;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
+.reportButton {
+  background-color: #fee2e2;
+  border: 1px solid #fecaca;
+  color: #b91c1c;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
 }
 
-.tag {
-  background-color: #eee;
-  color: #333;
-  padding: 4px 10px;
-  border-radius: 20px;
-  font-size: 0.85rem;
+.reportButton:hover {
+  background-color: #fecaca;
+}
+
+.centeredMessage {
+  text-align: center;
+  padding: 2rem;
+}
+
+.error {
+  color: #dc2626;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.backButton {
+  padding: 0.6rem 1.2rem;
+  background-color: #d1d5db;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.2s ease;
+}
+
+.backButton:hover {
+  background-color: #9ca3af;
 }

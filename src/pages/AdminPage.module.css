@@ -1,33 +1,91 @@
 .container {
-  max-width: 800px;
+  max-width: 900px;
   margin: 2rem auto;
-  padding: 1.5rem;
-  background-color: #fff;
-  border-radius: 12px;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.05);
+  padding: 2rem;
+  background-color: #f9fafb;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
 }
 
 .title {
-  font-size: 1.8rem;
-  font-weight: bold;
-  margin-bottom: 1rem;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+  text-align: center;
+  color: #1f2937;
 }
 
 .subtitle {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-  color: #4f46e5;
+  font-size: 1.25rem;
+  margin-bottom: 2rem;
+  color: #6366f1;
+  text-align: center;
 }
 
 .reportList {
   list-style: none;
   padding: 0;
+  margin: 0;
 }
 
-.reportItem {
-  border: 1px solid #ddd;
-  padding: 1rem;
-  border-radius: 8px;
+.reportCard {
+  background-color: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.reportCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+}
+
+.reportCard p {
+  margin: 0.25rem 0;
+  color: #374151;
+  font-size: 0.95rem;
+}
+
+.deleteBtn,
+.moveBtn,
+.dangerBtn {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 500;
+  font-size: 0.9rem;
+  margin-right: 0.5rem;
   margin-bottom: 1rem;
-  background-color: #fafafa;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.deleteBtn {
+  background-color: #f3f4f6;
+  color: #374151;
+}
+
+.deleteBtn:hover {
+  background-color: #e5e7eb;
+}
+
+.moveBtn {
+  background-color: #6366f1;
+  color: white;
+}
+
+.moveBtn:hover {
+  background-color: #4f46e5;
+}
+
+.dangerBtn {
+  background-color: #ef4444;
+  color: white;
+}
+
+.dangerBtn:hover {
+  background-color: #dc2626;
 }

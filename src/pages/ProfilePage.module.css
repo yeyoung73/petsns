@@ -1,12 +1,25 @@
 .container {
-  max-width: 400px;
-  margin: 50px auto;
+  max-width: 420px;
+  margin: 60px auto;
   padding: 30px;
   background-color: #ffffff;
   border-radius: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
   text-align: center;
   font-family: "Segoe UI", sans-serif;
+}
+
+.title {
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #1f2937;
+}
+
+.avatarWrapper {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
 .avatar {
@@ -14,73 +27,98 @@
   height: 120px;
   object-fit: cover;
   border-radius: 50%;
-  border: 3px solid #ddd;
-  margin-bottom: 20px;
+  border: 3px solid #d1d5db;
 }
 
-h2 {
-  font-size: 24px;
-  margin-bottom: 16px;
+.avatarPlaceholder {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background-color: #f3f4f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 40px;
+  color: #6b7280;
+  border: 3px solid #d1d5db;
 }
 
 p {
+  font-size: 15px;
+  color: #374151;
   margin: 8px 0;
-  font-size: 16px;
-  color: #333;
 }
 
 strong {
-  color: #444;
+  color: #111827;
+}
+
+.followInfo {
+  display: flex;
+  justify-content: space-between;
+  margin: 20px 0;
+  font-size: 14px;
+  color: #374151;
 }
 
 .actions {
   display: flex;
-  justify-content: center;
+  flex-wrap: wrap;
   gap: 10px;
+  justify-content: center;
   margin-top: 20px;
 }
 
 button {
-  background-color: #4caf50;
+  background-color: #4f46e5;
   color: white;
   border: none;
   padding: 10px 16px;
   border-radius: 8px;
   font-size: 14px;
   cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-button:hover {
-  background-color: #45a045;
-}
-
-.error {
-  text-align: center;
-  color: red;
-  margin-top: 50px;
-  font-weight: bold;
-}
-
-.followButton {
-  margin-left: 10px;
-  padding: 4px 10px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-  font-weight: bold;
-  font-size: 0.9rem;
   transition: background-color 0.2s ease;
 }
 
-/* 팔로우 전 - 강조된 색 */
+button:hover {
+  background-color: #4338ca;
+}
+
+.followButton {
+  font-weight: bold;
+}
+
+.followingTrue {
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
 .followingFalse {
   background-color: #4f46e5;
   color: white;
 }
 
-/* 팔로우 후 - 중립적인 회색 */
-.followingTrue {
-  background-color: #e5e7eb;
-  color: #333;
+.reportButton {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+.reportButton:hover {
+  background-color: #fecaca;
+}
+
+.blockButton {
+  background-color: #fcd34d;
+  color: #92400e;
+}
+
+.blockButton:hover {
+  background-color: #fbbf24;
+}
+
+.error {
+  color: red;
+  text-align: center;
+  margin-top: 50px;
+  font-weight: bold;
 }

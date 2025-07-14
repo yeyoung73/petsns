@@ -7,6 +7,7 @@ import type { Post } from "../types/Post";
 import styles from "./PostDetailPage.module.css";
 import { useLike } from "../hooks/useLike";
 import { useFollow } from "../hooks/useFollow";
+import { Link } from "react-router-dom";
 
 const PostDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -108,8 +109,12 @@ const PostDetailPage: React.FC = () => {
     <div className={styles.pageContainer}>
       <div className={styles.header}>
         <div>
-          <span className={styles.authorInfo}>작성자: {post.username}</span>
-
+          <span className={styles.authorInfo}>
+            작성자:{" "}
+            <Link to={`/users/${post.user_id}`} className={styles.authorLink}>
+              {post.username}
+            </Link>
+          </span>
           {followTargetId && (
             <button
               onClick={toggleFollow}

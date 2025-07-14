@@ -61,39 +61,27 @@ const ProfilePage: React.FC = () => {
 
   return (
     <div className={styles.container}>
-      <h2>{id ? `${profile.username}님의 프로필` : "내 프로필"}</h2>
+      <h2 className={styles.title}>
+        {id ? `${profile.username}님의 프로필` : "내 프로필"}
+      </h2>
 
-      {profile.profile_image && (
-        <img
-          src={getImageUrl(profile.profile_image)}
-          alt="프로필 이미지"
-          className={styles.avatar}
-        />
-      )}
+      <div className={styles.avatarWrapper}>
+        {profile.profile_image ? (
+          <img
+            src={getImageUrl(profile.profile_image)}
+            alt="프로필 이미지"
+            className={styles.avatar}
+          />
+        ) : (
+          <div className={styles.avatarPlaceholder}>😺</div>
+        )}
+      </div>
 
       <p>
         <strong>이름:</strong> {profile.username}
       </p>
       <p>
         <strong>이메일:</strong> {profile.email}
-      </p>
-
-      {profile.user_id !== currentUserId && (
-        <button
-          onClick={toggleFollow}
-          className={`${styles.followButton} ${
-            isFollowing ? styles.followingTrue : styles.followingFalse
-          }`}
-        >
-          {isFollowing ? "언팔로우" : "팔로우"} ({followerCount})
-        </button>
-      )}
-
-      <p>
-        <strong>팔로잉:</strong> {followingCount}명
-      </p>
-      <p>
-        <strong>팔로워:</strong> {followerCount}명
       </p>
 
       {profile.bio && (
@@ -107,10 +95,32 @@ const ProfilePage: React.FC = () => {
         {new Date(profile.created_at).toLocaleDateString()}
       </p>
 
-      {profile.user_id === currentUserId && (
+      <div className={styles.followInfo}>
+        <span>
+          <strong>팔로잉:</strong> {followingCount}명
+        </span>
+        <span>
+          <strong>팔로워:</strong> {followerCount}명
+        </span>
+      </div>
+
+      {profile.user_id !== currentUserId ? (
         <div className={styles.actions}>
-          <button onClick={handleEdit}>수정</button>
-          <button onClick={handleDelete}>탈퇴</button>
+          <button
+            onClick={toggleFollow}
+            className={`${styles.followButton} ${
+              isFollowing ? styles.followingTrue : styles.followingFalse
+            }`}
+          >
+            {isFollowing ? "언팔로우" : "팔로우"}
+          </button>
+          <button className={styles.reportButton}>🚨 신고</button>
+          <button className={styles.blockButton}>🚫 차단</button>
+        </div>
+      ) : (
+        <div className={styles.actions}>
+          <button onClick={handleEdit}>프로필 수정</button>
+          <button onClick={handleDelete}>회원 탈퇴</button>
         </div>
       )}
     </div>
