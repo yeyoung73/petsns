@@ -1,0 +1,58 @@
+.commentSection {
+  margin-top: 2rem;
+  border-top: 1px solid #ccc;
+  padding-top: 1rem;
+}
+
+.commentTitle {
+  font-size: 1.2rem;
+  font-weight: bold;
+  margin-bottom: 1rem;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.commentForm {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  width: 100%; /* ✅ 폭 100%로 확장 */
+  box-sizing: border-box;
+}
+
+.textarea {
+  width: 100%; /* ✅ 폭 맞추기 */
+  resize: vertical;
+  min-height: 80px;
+  padding: 0.5rem;
+  font-size: 1rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-sizing: border-box; /* ✅ 패딩 포함해서 정확히 계산 */
+}
+
+.submitButton {
+  align-self: flex-end;
+  background-color: #4f46e5;
+  color: white;
+  padding: 0.4rem 1rem;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.submitButton:hover {
+  background-color: #4338ca;
+}
+
+.commentList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}

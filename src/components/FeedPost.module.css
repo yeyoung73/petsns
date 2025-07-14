@@ -1,0 +1,84 @@
+.feedPost {
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+  background-color: #ffffff;
+  overflow: hidden;
+  padding: 1rem;
+  box-sizing: border-box;
+  width: 100%;
+}
+
+.username {
+  padding: 0.75rem;
+  font-weight: bold;
+  font-size: 0.875rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.image {
+  width: 100%;
+  max-height: 400px;
+  object-fit: cover;
+  display: block;
+}
+
+.content {
+  padding: 0.75rem;
+}
+
+.text {
+  font-size: 0.9rem;
+  color: #374151;
+  margin-bottom: 0.5rem;
+}
+
+.link {
+  font-size: 0.85rem;
+  color: #3b82f6;
+  text-decoration: none;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.likeButton {
+  margin-top: 8px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  color: #e91e63;
+}
+
+.likeWrapper {
+  margin-top: 12px;
+}
+
+.tags {
+  margin-top: 0.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.tag {
+  background-color: #f0f0f0;
+  border-radius: 12px;
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  color: #333;
+  cursor: default;
+}
+
+.usernameLink {
+  color: #333;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.usernameLink:hover {
+  text-decoration: underline;
+}

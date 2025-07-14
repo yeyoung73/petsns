@@ -1,0 +1,149 @@
+.container {
+  max-width: 700px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background-color: #ffffff;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 1rem;
+}
+
+.title {
+  font-size: 1.75rem;
+  font-weight: bold;
+  color: #333;
+}
+
+.greeting {
+  font-size: 0.875rem;
+  color: #777;
+  margin-top: 0.25rem;
+}
+
+.logoutButton {
+  background-color: #ef4444;
+  color: white;
+  font-size: 0.875rem;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+}
+
+.logoutButton:hover {
+  background-color: #dc2626;
+}
+
+.menu {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-bottom: 2rem;
+}
+
+.menuButton {
+  font-size: 0.875rem;
+  padding: 0.5rem 1.2rem;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.listButton {
+  background-color: #f3f4f6;
+  color: #111827;
+  border: 1px solid #d1d5db;
+}
+
+.listButton:hover {
+  background-color: #e5e7eb;
+}
+
+.registerButton {
+  background-color: #10b981;
+  color: white;
+}
+
+.registerButton:hover {
+  background-color: #059669;
+}
+
+.postButton {
+  background-color: #3b82f6;
+  color: white;
+}
+
+.postButton:hover {
+  background-color: #2563eb;
+}
+
+.filterWrapper {
+  display: flex;
+  gap: 8px;
+  margin: 1rem 0;
+  padding-left: 0.75rem;
+}
+
+.filterButton {
+  padding: 6px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 20px;
+  background-color: #f9fafb;
+  color: #374151;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.filterButton:hover {
+  background-color: #e5e7eb;
+}
+
+.active {
+  background-color: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.tagFilterNotice {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  background-color: #fef3c7;
+  border: 1px solid #fcd34d;
+  padding: 0.75rem 1rem;
+  margin: 1rem;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  color: #92400e;
+}
+
+.clearTagButton {
+  background: none;
+  border: none;
+  color: #dc2626;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.clearTagButton:hover {
+  text-decoration: underline;
+}
+
+.adminButton {
+  background-color: #111827;
+  color: white;
+}
+
+.adminButton:hover {
+  background-color: #1f2937;
+}
