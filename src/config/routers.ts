@@ -12,6 +12,9 @@ import PostEditPage from "../pages/PostEditPage";
 import UserProfilePage from "../pages/UserProfilePage";
 import EditProfilePage from "../pages/EditProfilePage";
 import AdminPage from "../pages/AdminPage";
+import WalkPage from "../pages/WalkPage";
+import WalkDetailPage from "../pages/WalkDetailPage";
+import WalkEditPage from "../pages/WalkEditPage";
 
 const AppRoutes = [
   {
@@ -77,7 +80,7 @@ const AppRoutes = [
   {
     id: 11,
     name: "반려동물 수정",
-    path: "/pets/:id/edit", // ← 반려동물 수정은 여기
+    path: "/pets/:id/edit",
     element: PetEditPage,
   },
   {
@@ -103,6 +106,30 @@ const AppRoutes = [
     name: "관리자 페이지",
     path: "/admin",
     element: AdminPage,
+  },
+  {
+    id: 16,
+    name: "산책 페이지",
+    path: "/walks", // General walks page
+    element: WalkPage,
+  },
+  {
+    id: 17,
+    name: "특정 반려동물 산책 페이지",
+    path: "/walks/pets/:petId", // Specific pet walks
+    element: WalkPage,
+  },
+  {
+    id: 18,
+    name: "산책 상세 페이지",
+    path: "/walks/:id",
+    element: WalkDetailPage,
+  },
+  {
+    id: 19,
+    name: "산책 상세 수정 페이지",
+    path: "/walks/:walkId/edit",
+    element: WalkEditPage,
   },
 ];
 

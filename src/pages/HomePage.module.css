@@ -165,3 +165,12 @@
 .clearTagButton:hover {
   text-decoration: underline;
 }
+
+.walkButton {
+  background-color: #4caf50;
+  color: white;
+}
+
+.walkButton:hover {
+  background-color: #45a049;
+}

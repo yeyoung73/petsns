@@ -1,0 +1,307 @@
+/* ────────────── 기본 컨테이너 ────────────── */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* ────────────── 헤더 및 제목 ────────────── */
+.header {
+  margin-bottom: 30px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.breadcrumb {
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 10px;
+}
+
+.breadcrumbLink {
+  color: #007bff;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.breadcrumbLink:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+.breadcrumbSeparator {
+  margin: 0 8px;
+  color: #999;
+}
+
+.breadcrumbCurrent {
+  font-weight: 500;
+  color: #333;
+}
+
+/* ────────────── 로딩 및 에러 ────────────── */
+.loading,
+.error {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.loading p {
+  font-size: 18px;
+  color: #666;
+}
+
+.error p {
+  font-size: 18px;
+  color: #dc3545;
+  margin-bottom: 20px;
+}
+
+.backButton,
+.retryButton {
+  display: inline-block;
+  padding: 10px 20px;
+  border-radius: 5px;
+  background-color: #007bff;
+  color: white;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.backButton:hover,
+.retryButton:hover {
+  background-color: #0056b3;
+}
+
+/* ────────────── 정보 카드 ────────────── */
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.infoCard,
+.mapSection {
+  background: #fff;
+  border-radius: 12px;
+  padding: 25px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.06);
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.infoGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.infoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.infoLabel {
+  font-size: 14px;
+  font-weight: 600;
+  color: #495057;
+}
+
+.infoValue {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.petLink {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.petLink:hover {
+  color: #0056b3;
+  text-decoration: underline;
+}
+
+/* ────────────── 지도 영역 ────────────── */
+.sectionTitle {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.mapContainer {
+  border-radius: 8px;
+  overflow: hidden;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.mapInfo {
+  background-color: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 15px;
+}
+
+.mapInfoItem {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.mapInfoLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: #495057;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.mapInfoValue {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+  font-family: "Courier New", monospace;
+}
+
+/* ────────────── 액션 버튼 ────────────── */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+  justify-content: center;
+}
+
+.actionButton {
+  padding: 12px 24px;
+  font-size: 16px;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  background-color: #007bff;
+  color: white;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.actionButton:hover {
+  background-color: #0056b3;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0, 123, 255, 0.3);
+}
+
+.deleteButton {
+  background-color: #dc3545;
+}
+
+.deleteButton:hover {
+  background-color: #c82333;
+  box-shadow: 0 4px 8px rgba(220, 53, 69, 0.3);
+}
+
+/* ────────────── 반응형 디자인 ────────────── */
+@media (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
+
+  .title {
+    font-size: 24px;
+  }
+
+  .infoGrid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .mapContainer {
+    height: 350px;
+  }
+
+  .mapInfo {
+    grid-template-columns: 1fr;
+  }
+
+  .actions {
+    flex-direction: column;
+  }
+
+  .actionButton {
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 10px;
+  }
+
+  .title {
+    font-size: 20px;
+  }
+
+  .breadcrumb {
+    font-size: 12px;
+  }
+
+  .mapContainer {
+    height: 300px;
+  }
+}
+
+/* ────────────── 커스텀 마커 ────────────── */
+:global(.start-marker),
+:global(.end-marker) {
+  background: transparent;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+
+/* ────────────── 애니메이션 ────────────── */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ────────────── 스크롤바 스타일 ────────────── */
+.container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.container::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 4px;
+}
+
+.container::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 4px;
+}
+
+.container::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}

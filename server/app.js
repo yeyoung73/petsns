@@ -17,6 +17,7 @@ import reportRoutes from "./routes/report.js";
 import adminRoutes from "./routes/admin.js";
 import blockRoutes from "./routes/block.js";
 import anniversaryRoutes from "./routes/anniversary.js";
+import walkRoutes from "./routes/walk.js";
 
 const app = express();
 app.use(
@@ -65,6 +66,7 @@ app.use("/api/reports", reportRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/blocks", blockRoutes);
 app.use("/api/anniversaries", anniversaryRoutes);
+app.use("/api/walks", walkRoutes);
 
 // 에러 핸들러, 포트 리슨 등
 app.use((err, req, res, next) => {

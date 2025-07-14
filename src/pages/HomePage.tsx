@@ -136,6 +136,12 @@ const HomePage: React.FC = () => {
           반려동물 추가
         </Link>
         <Link
+          to="/walks"
+          className={`${styles.menuButton} ${styles.walkButton}`}
+        >
+          산책 기록
+        </Link>
+        <Link
           to="/posts/new"
           className={`${styles.menuButton} ${styles.postButton}`}
         >
