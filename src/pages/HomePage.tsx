@@ -3,6 +3,8 @@ import { Link, useNavigate } from "react-router-dom";
 import PostList from "../components/PostList";
 import type { Post } from "../types/Post";
 import styles from "./HomePage.module.css";
+import api from "../services/api";
+import UpcomingAnniversaryList from "../components/UpcomingAnniversaryList";
 
 const HomePage: React.FC = () => {
   const [posts, setPosts] = useState<Post[]>([]);
@@ -63,6 +65,21 @@ const HomePage: React.FC = () => {
     fetchPosts();
   }, [filter, selectedTag]);
 
+  useEffect(() => {
+    const fetchUpcoming = async () => {
+      try {
+        const res = await api.get("/api/anniversaries/upcoming");
+        if (res.data.length > 0) {
+          alert(`📅 ${res.data.length}건의 다가오는 기념일이 있어요!`);
+        }
+      } catch (err) {
+        console.error("다가오는 기념일 불러오기 실패:", err);
+      }
+    };
+
+    fetchUpcoming();
+  }, []);
+
   if (!Array.isArray(posts)) {
     return <p>게시글을 불러올 수 없습니다.</p>;
   }
@@ -104,7 +121,7 @@ const HomePage: React.FC = () => {
           </button>
         </div>
       </div>
-
+      <UpcomingAnniversaryList />
       <div className={styles.menu}>
         <Link
           to="/pets"

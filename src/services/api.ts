@@ -207,6 +207,29 @@ export const authUtils = {
   },
 };
 
+// 기념일 목록 가져오기
+export const fetchAnniversaries = async (petId: number) => {
+  const res = await axios.get(`/api/anniversaries/pets/${petId}`);
+  return res.data;
+};
+
+// 기념일 등록
+export const createAnniversary = async (data: {
+  pet_id: number;
+  title: string;
+  date: string;
+  memo?: string;
+  image?: string;
+}) => {
+  const res = await axios.post(`/api/anniversaries`, data);
+  return res.data;
+};
+
+// 기념일 삭제
+export const deleteAnniversary = async (anniversaryId: number) => {
+  await axios.delete(`/api/anniversaries/${anniversaryId}`);
+};
+
 export default api;
 
 // 타입 내보내기

@@ -14,5 +14,8 @@ const pool = new Pool({
   port: Number(process.env.DB_PORT),
   database: process.env.DB_NAME,
 });
+pool.on("connect", (client) => {
+  client.query("SET search_path TO petsns");
+});
 
 export default pool;

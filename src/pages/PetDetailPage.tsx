@@ -5,6 +5,8 @@ import { convertPetData } from "../utils/petUtils";
 import { getImageUrl } from "../config/api";
 import type { Pet } from "../types/Pet";
 import styles from "./PetDetailPage.module.css";
+import AnniversaryForm from "../components/anniversaryForm";
+import AnniversaryList from "../components/AnniversaryList";
 
 const PetDetailPage = () => {
   const { id } = useParams();
@@ -44,6 +46,8 @@ const PetDetailPage = () => {
   if (!pet) return <p>불러오는 중...</p>;
   return (
     <div className={styles.container}>
+      <AnniversaryForm petId={pet.id} onCreated={() => {}} />
+      <AnniversaryList petId={pet.id} />
       <h2>{pet.name}</h2>
       <img
         src={getImageUrl(pet.profileImage ?? null)}
