@@ -84,6 +84,6 @@ app.use((err, req, res, next) => {
   console.error(err);
   res.status(500).json({ message: "서버 에러" });
 });
-
+console.log("✅ 서버 실행 시도됨");
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
