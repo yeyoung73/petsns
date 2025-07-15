@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const api = axios.create({
-  baseURL: "http://localhost:3000", // 또는 your API base URL
+  baseURL: "https://petsns-production.up.railway.app/api", // 또는 your API base URL
 });
 
 // 요청 인터셉터에서 토큰 자동 추가
