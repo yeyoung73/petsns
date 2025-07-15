@@ -18,7 +18,10 @@ import adminRoutes from "./routes/admin.js";
 import blockRoutes from "./routes/block.js";
 import anniversaryRoutes from "./routes/anniversary.js";
 import walkRoutes from "./routes/walk.js";
-
+// Add to the top of app.js
+console.log("🚀 Starting application...");
+console.log("📍 Environment:", process.env.NODE_ENV);
+console.log("📍 Port:", process.env.PORT);
 const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
