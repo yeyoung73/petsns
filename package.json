@@ -4,11 +4,12 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "nodemon app.js",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "start": "node server/app.js"
+    "start": "node app.js",
+    "dev": "nodemon app.js",
+    "debug": "node --inspect=0.0.0.0:9229 app.js"
   },
   "dependencies": {
     "@reduxjs/toolkit": "^2.8.2",
