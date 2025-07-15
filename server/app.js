@@ -22,7 +22,7 @@ import walkRoutes from "./routes/walk.js";
 const app = express();
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://your-app.up.railway.app", // Railway 주소로 나중에 바꿔줘
+  "petsns-production.up.railway.app", // Railway 주소로 나중에 바꿔줘
 ];
 
 app.use(
