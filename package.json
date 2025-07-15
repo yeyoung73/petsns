@@ -4,7 +4,7 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "build": "echo 'No build step needed for Node.js app'",
+    "build": "echo 'No build step needed'",
     "lint": "eslint .",
     "preview": "vite preview",
     "start": "node app.js",
