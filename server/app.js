@@ -65,7 +65,13 @@ try {
 } catch (err) {
   console.warn("⚠️ swagger-output.json 파일이 없습니다. Swagger 비활성화됨");
 }
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
+});
 
+app.get("/", (req, res) => {
+  res.status(200).json({ message: "PetSNS API is running" });
+});
 if (Object.keys(swaggerDocument).length > 0) {
   app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 }
@@ -89,4 +95,6 @@ app.use((err, req, res, next) => {
 });
 console.log("✅ 서버 실행 시도됨");
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server listening on ${PORT}`));
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server listening on ${PORT}`);
+});
