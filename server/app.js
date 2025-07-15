@@ -52,12 +52,17 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
-const raw = fs.readFileSync(
-  path.join(process.cwd(), "swagger-output.json"),
-  "utf8"
-);
-
-const swaggerDocument = JSON.parse(raw);
+let swaggerDocument = {};
+try {
+  const raw = fs.readFileSync(
+    path.join(process.cwd(), "swagger-output.json"),
+    "utf8"
+  );
+  swaggerDocument = JSON.parse(raw);
+  if (swaggerDocument.swagger) delete swaggerDocument.swagger;
+} catch (err) {
+  console.warn("⚠️ swagger-output.json 파일을 읽을 수 없습니다:", err.message);
+}
 
 // ここで余分な swagger フィールドを消す
 if (swaggerDocument.swagger) {
