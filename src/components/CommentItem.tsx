@@ -2,7 +2,8 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import styles from "./CommentItem.module.css";
 import { getImageUrl } from "../config/api";
-import { differenceInHours, format, formatDistanceToNow } from "date-fns";
+import { differenceInHours, format } from "date-fns";
+import { formatDistanceToNow } from "date-fns/formatDistanceToNow";
 import { ko } from "date-fns/locale";
 
 interface CommentNode {
@@ -14,6 +15,7 @@ interface CommentNode {
   content: string;
   created_at: string;
   children: CommentNode[];
+  is_deleted: boolean;
   profile_image?: string; // 선택적 이미지
 }
 

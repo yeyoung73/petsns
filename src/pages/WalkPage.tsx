@@ -11,7 +11,7 @@ import L from "leaflet";
 import { convertPetListData } from "../utils/petUtils";
 
 const WalkPage: React.FC = () => {
-  const { petId: urlPetId } = useParams<{ petId: number }>();
+  const { petId: urlPetId } = useParams<{ petId: string }>();
   const navigate = useNavigate();
   const [walks, setWalks] = useState<Walk[]>([]);
   const [pets, setPets] = useState<Pet[]>([]);

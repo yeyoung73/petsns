@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import api from "../services/api";
+import axios from "axios";
 
 interface ReplyFormProps {
   postId: number;
@@ -35,7 +36,7 @@ const ReplyForm: React.FC<ReplyFormProps> = ({
       setContent("");
       onReplySuccess();
     } catch (err) {
-      if (err.response?.status === 403) {
+      if (axios.isAxiosError(err) && err.response?.status === 403) {
         alert("❌ 차단된 유저의 게시물에는 댓글을 작성할 수 없습니다.");
       } else {
         console.error("대댓글 작성 실패:", err);

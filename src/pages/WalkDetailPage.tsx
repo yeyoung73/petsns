@@ -63,7 +63,7 @@ const WalkDetailPage: React.FC = () => {
         }
 
         // route 데이터 파싱 안전하게 처리
-        let parsedPath: number[][] = [];
+        let parsedPath = JSON.parse(walkData.route) as [number, number][];
         if (walkData.route) {
           try {
             parsedPath =
@@ -232,9 +232,9 @@ const WalkDetailPage: React.FC = () => {
   // 지도 중심점 계산 (경로가 있는 경우)
   const getMapCenter = () => {
     if (walk.path && walk.path.length > 0) {
-      return walk.path[0];
+      return walk.path?.[0] ?? [37.5665, 126.978];
     }
-    return [37.5665, 126.978]; // 기본값 (서울)
+    // return [37.5665, 126.978]; // 기본값 (서울)
   };
 
   return (

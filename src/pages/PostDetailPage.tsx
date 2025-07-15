@@ -105,6 +105,10 @@ const PostDetailPage: React.FC = () => {
     );
   }
 
+  if (loading) {
+    return <p>로딩 중</p>;
+  }
+
   return (
     <div className={styles.pageContainer}>
       <div className={styles.header}>

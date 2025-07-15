@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PetForm from "../components/PetForm";
 import { petAPI } from "../services/api";

@@ -11,6 +11,7 @@ interface CommentNode {
   username: string;
   content: string;
   created_at: string;
+  is_deleted: boolean;
   children: CommentNode[];
 }
 
@@ -122,7 +123,7 @@ const CommentSection: React.FC<Props> = ({ postId }) => {
         {comments.map((comment) => (
           <CommentItem
             key={comment.id}
-            comment={comment}
+            comment={{ ...comment, is_deleted: comment.is_deleted ?? false }}
             currentUserId={currentUserId}
             onDelete={handleDelete}
             onUpdate={handleUpdate}

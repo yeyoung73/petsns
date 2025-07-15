@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { petAPI } from "../services/api";
 import { convertPetData } from "../utils/petUtils";
 import { getImageUrl } from "../config/api";
 import type { Pet } from "../types/Pet";
 import styles from "./PetDetailPage.module.css";
-import AnniversaryForm from "../components/anniversaryForm";
+import AnniversaryForm from "../components/AnniversaryForm";
 import AnniversaryList from "../components/AnniversaryList";
 import WalkTracker from "../components/WalkTracker";
 

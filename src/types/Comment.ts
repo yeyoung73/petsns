@@ -7,6 +7,6 @@ export interface CommentNode {
   content: string;
   created_at: string;
   children: CommentNode[];
-  is_deleted?: boolean; // ✅ 꼭 필요
+  is_deleted: boolean; // ✅ 꼭 필요
   profile_image?: string;
 }
