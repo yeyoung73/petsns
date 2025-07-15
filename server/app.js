@@ -1,162 +1,142 @@
-#!/usr/bin/env node
+import express from "express";
+import cors from "cors";
+import dotenv from "dotenv";
 
-// Minimal app.js for Railway testing
-console.log("🚀 === PETSNS API STARTING ===");
-console.log("📍 Node version:", process.version);
-console.log("📍 Platform:", process.platform);
-console.log("📍 Working directory:", process.cwd());
-console.log("📍 Environment:", process.env.NODE_ENV);
-console.log("📍 Port:", process.env.PORT);
-console.log("📍 Railway vars:", {
-  RAILWAY_PUBLIC_DOMAIN: process.env.RAILWAY_PUBLIC_DOMAIN,
-  RAILWAY_PRIVATE_DOMAIN: process.env.RAILWAY_PRIVATE_DOMAIN,
+dotenv.config();
+
+const app = express();
+const PORT = process.env.PORT || 8080;
+const HOST = process.env.HOST || "0.0.0.0";
+
+// 미들웨어 설정
+app.use(cors());
+app.use(express.json());
+
+// 서버 시작 시간 기록
+const startTime = Date.now();
+
+// Health check endpoint
+app.get("/health", (req, res) => {
+  const healthData = {
+    status: "healthy",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    memory: process.memoryUsage(),
+    pid: process.pid,
+    environment: process.env.NODE_ENV || "production",
+  };
+
+  console.log(`📨 ${new Date().toISOString()} - GET /health from ${req.ip}`);
+  console.log("📨 Health check request");
+
+  res.status(200).json(healthData);
 });
 
-// Test if we can import express
-try {
-  console.log("📦 Importing express...");
-  const express = await import("express");
-  console.log("✅ Express imported successfully");
-
-  const app = express.default();
-
-  // Basic middleware
-  app.use(express.default.json());
-
-  // 모든 요청 로깅
-  app.use((req, res, next) => {
-    console.log(
-      `📨 ${new Date().toISOString()} - ${req.method} ${req.url} from ${req.ip}`
-    );
-    next();
+// Railway용 준비성 체크
+app.get("/ready", (req, res) => {
+  res.status(200).json({
+    status: "ready",
+    timestamp: new Date().toISOString(),
   });
+});
 
-  // Health check route (빠른 응답을 위해 간소화)
-  app.get("/", (req, res) => {
-    console.log("📨 Root request received");
-    res.json({
-      message: "PetSNS API is running!",
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      version: "1.0.0",
-    });
-  });
+// Test API endpoint
+app.get("/api/test", (req, res) => {
+  res.json({ message: "PETSNS API is working!" });
+});
 
-  app.get("/health", (req, res) => {
-    console.log("📨 Health check request");
-    res.status(200).json({
-      status: "OK",
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      port: process.env.PORT,
-      environment: process.env.NODE_ENV,
-    });
-  });
+// 서버 시작 (server 변수에 할당하여 나중에 graceful shutdown에서 사용)
+console.log("🚀 === PETSNS API STARTING ===");
+console.log(`📍 Node version: ${process.version}`);
+console.log(`📍 Platform: ${process.platform}`);
+console.log(`📍 Working directory: ${process.cwd()}`);
+console.log(`📍 Environment: ${process.env.NODE_ENV || "production"}`);
+console.log(`📍 Port: ${PORT}`);
 
-  // Test API route
-  app.get("/api/test", (req, res) => {
-    console.log("📨 API test request");
-    res.json({
-      message: "API is working!",
-      timestamp: new Date().toISOString(),
-    });
-  });
+if (process.env.RAILWAY_PUBLIC_DOMAIN) {
+  console.log("📍 Railway vars: {");
+  console.log(
+    ` RAILWAY_PUBLIC_DOMAIN: '${process.env.RAILWAY_PUBLIC_DOMAIN}',`
+  );
+  console.log(
+    ` RAILWAY_PRIVATE_DOMAIN: '${process.env.RAILWAY_PRIVATE_DOMAIN}'`
+  );
+  console.log("}");
+}
 
-  // 404 handler
-  app.use((req, res) => {
-    console.log("📨 404 request:", req.method, req.url);
-    res.status(404).json({
-      error: "Not Found",
-      path: req.url,
-      method: req.method,
-    });
-  });
+console.log("📦 Importing express...");
+console.log("✅ Express imported successfully");
+console.log(`🚀 Attempting to start server on ${HOST}:${PORT}...`);
 
-  // Error handler
-  app.use((err, req, res, next) => {
-    console.error("❌ Server error:", err);
-    res.status(500).json({
-      error: "Internal Server Error",
-      message:
-        process.env.NODE_ENV === "development"
-          ? err.message
-          : "Something went wrong",
-    });
-  });
+const server = app.listen(PORT, HOST, () => {
+  console.log("✅ === APP SETUP COMPLETE ===");
+  console.log("✅ === SERVER SUCCESSFULLY STARTED ===");
+  console.log(`🌐 Server running on ${HOST}:${PORT}`);
+  console.log(`🏥 Health check: http://${HOST}:${PORT}/health`);
+  console.log(`🧪 Test API: http://${HOST}:${PORT}/api/test`);
+  console.log("✅ Production server ready for external connections");
+  console.log(`🎯 Server is actively listening on ${HOST}:${PORT}`);
+});
 
-  // Start server
-  const PORT = process.env.PORT || 3000;
-  const HOST = "0.0.0.0";
+// 30초마다 서버 생존 확인
+setInterval(() => {
+  const uptimeSeconds = Math.floor((Date.now() - startTime) / 1000);
+  console.log(`💓 Server alive for ${uptimeSeconds} seconds`);
+}, 30000);
 
-  console.log(`🚀 Attempting to start server on ${HOST}:${PORT}...`);
+// 1분마다 메모리 사용량 로그
+setInterval(() => {
+  const memUsage = process.memoryUsage();
+  const memUsageMB = {
+    rss: Math.round(memUsage.rss / 1024 / 1024),
+    heapTotal: Math.round(memUsage.heapTotal / 1024 / 1024),
+    heapUsed: Math.round(memUsage.heapUsed / 1024 / 1024),
+    external: Math.round(memUsage.external / 1024 / 1024),
+  };
+  console.log(`📊 Memory usage (MB):`, memUsageMB);
+}, 60000);
 
-  const server = app.listen(PORT, HOST, () => {
-    console.log(`✅ === SERVER SUCCESSFULLY STARTED ===`);
-    console.log(`🌐 Server running on ${HOST}:${PORT}`);
-    console.log(`🏥 Health check: http://${HOST}:${PORT}/health`);
-    console.log(`🧪 Test API: http://${HOST}:${PORT}/api/test`);
+// Graceful shutdown 처리
+const gracefulShutdown = (signal) => {
+  console.log(`\n🛑 Received ${signal}. Starting graceful shutdown...`);
 
-    // Railway 환경에서 서버가 준비되었음을 알림
-    if (process.env.NODE_ENV === "production") {
-      console.log(`✅ Production server ready for external connections`);
-    }
-  });
-
-  server.on("error", (err) => {
-    console.error("❌ Server startup error:", err);
-    if (err.code === "EADDRINUSE") {
-      console.error(`❌ Port ${PORT} is already in use`);
-    }
-    process.exit(1);
-  });
-
-  // 서버가 실제로 리스닝 중인지 확인
-  server.on("listening", () => {
-    const addr = server.address();
-    console.log(
-      `🎯 Server is actively listening on ${addr.address}:${addr.port}`
-    );
-  });
-
-  // Graceful shutdown
-  const shutdown = (signal) => {
-    console.log(`🛑 Shutdown signal received: ${signal}`);
-    server.close(() => {
-      console.log("👋 Server closed gracefully");
+  if (server) {
+    server.close((err) => {
+      if (err) {
+        console.error("❌ Error during server shutdown:", err);
+        process.exit(1);
+      }
+      console.log("✅ Server closed successfully");
       process.exit(0);
     });
 
-    // Force exit after 10 seconds
+    // 10초 후 강제 종료
     setTimeout(() => {
-      console.log("⏰ Forced shutdown after timeout");
+      console.log("⏰ Forcing shutdown after timeout");
       process.exit(1);
     }, 10000);
-  };
+  } else {
+    process.exit(0);
+  }
+};
 
-  process.on("SIGTERM", () => shutdown("SIGTERM"));
-  process.on("SIGINT", () => shutdown("SIGINT"));
+// 시그널 처리
+process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
+process.on("SIGINT", () => gracefulShutdown("SIGINT"));
+process.on("SIGQUIT", () => gracefulShutdown("SIGQUIT"));
 
-  // Keep alive heartbeat (더 자주 체크)
-  setInterval(() => {
-    const uptime = Math.floor(process.uptime());
-    console.log(`💓 Server alive for ${uptime} seconds`);
-  }, 30000);
-
-  console.log("✅ === APP SETUP COMPLETE ===");
-} catch (err) {
-  console.error("❌ === STARTUP FAILED ===");
-  console.error("Error:", err.message);
-  console.error("Stack:", err.stack);
-  process.exit(1);
-}
-
-// Global error handlers
+// 예외 처리
 process.on("uncaughtException", (err) => {
   console.error("❌ Uncaught Exception:", err);
-  process.exit(1);
+  gracefulShutdown("UNCAUGHT_EXCEPTION");
 });
 
 process.on("unhandledRejection", (reason, promise) => {
   console.error("❌ Unhandled Rejection at:", promise, "reason:", reason);
-  process.exit(1);
+  gracefulShutdown("UNHANDLED_REJECTION");
+});
+
+// 프로세스 초기화 완료
+process.nextTick(() => {
+  console.log("✅ Process initialization complete");
 });
