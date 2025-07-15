@@ -20,9 +20,20 @@ import anniversaryRoutes from "./routes/anniversary.js";
 import walkRoutes from "./routes/walk.js";
 
 const app = express();
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://your-app.up.railway.app", // Railway 주소로 나중에 바꿔줘
+];
+
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
