@@ -13,6 +13,10 @@ const pool = new Pool({
   host: process.env.DB_HOST,
   port: Number(process.env.DB_PORT),
   database: process.env.DB_NAME,
+  connectionString: process.env.DB_URL,
+  ssl: {
+    rejectUnauthorized: false, // Railway는 SSL 필요함
+  },
 });
 pool.on("connect", (client) => {
   client.query("SET search_path TO petsns");
