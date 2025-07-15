@@ -5,7 +5,7 @@ nixPkgs = ["nodejs_18", "npm"]
 cmds = ["npm ci"]
 
 [phases.build]
-cmds = ["npm run build"]
+cmds = ["echo 'No build step needed for Node.js app'"]
 
 [start]
 cmd = "npm start"
