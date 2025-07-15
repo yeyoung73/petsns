@@ -7,6 +7,10 @@ console.log("📍 Platform:", process.platform);
 console.log("📍 Working directory:", process.cwd());
 console.log("📍 Environment:", process.env.NODE_ENV);
 console.log("📍 Port:", process.env.PORT);
+console.log("📍 Railway vars:", {
+  RAILWAY_PUBLIC_DOMAIN: process.env.RAILWAY_PUBLIC_DOMAIN,
+  RAILWAY_PRIVATE_DOMAIN: process.env.RAILWAY_PRIVATE_DOMAIN,
+});
 
 // Test if we can import express
 try {
@@ -19,7 +23,15 @@ try {
   // Basic middleware
   app.use(express.default.json());
 
-  // Health check route
+  // 모든 요청 로깅
+  app.use((req, res, next) => {
+    console.log(
+      `📨 ${new Date().toISOString()} - ${req.method} ${req.url} from ${req.ip}`
+    );
+    next();
+  });
+
+  // Health check route (빠른 응답을 위해 간소화)
   app.get("/", (req, res) => {
     console.log("📨 Root request received");
     res.json({
@@ -32,11 +44,11 @@ try {
 
   app.get("/health", (req, res) => {
     console.log("📨 Health check request");
-    res.json({
+    res.status(200).json({
       status: "OK",
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
-      memory: process.memoryUsage(),
+      port: process.env.PORT,
       environment: process.env.NODE_ENV,
     });
   });
@@ -74,19 +86,20 @@ try {
 
   // Start server
   const PORT = process.env.PORT || 3000;
+  const HOST = "0.0.0.0";
 
-  console.log(`🚀 Attempting to start server on port ${PORT}...`);
+  console.log(`🚀 Attempting to start server on ${HOST}:${PORT}...`);
 
-  const server = app.listen(PORT, "0.0.0.0", () => {
+  const server = app.listen(PORT, HOST, () => {
     console.log(`✅ === SERVER SUCCESSFULLY STARTED ===`);
-    console.log(`🌐 Server running on port ${PORT}`);
-    console.log(`🏥 Health check: http://localhost:${PORT}/health`);
-    console.log(`🧪 Test API: http://localhost:${PORT}/api/test`);
-  });
-  // 모든 요청 로깅
-  app.use((req, res, next) => {
-    console.log(`📨 ${new Date().toISOString()} - ${req.method} ${req.url}`);
-    next();
+    console.log(`🌐 Server running on ${HOST}:${PORT}`);
+    console.log(`🏥 Health check: http://${HOST}:${PORT}/health`);
+    console.log(`🧪 Test API: http://${HOST}:${PORT}/api/test`);
+
+    // Railway 환경에서 서버가 준비되었음을 알림
+    if (process.env.NODE_ENV === "production") {
+      console.log(`✅ Production server ready for external connections`);
+    }
   });
 
   server.on("error", (err) => {
@@ -97,9 +110,17 @@ try {
     process.exit(1);
   });
 
+  // 서버가 실제로 리스닝 중인지 확인
+  server.on("listening", () => {
+    const addr = server.address();
+    console.log(
+      `🎯 Server is actively listening on ${addr.address}:${addr.port}`
+    );
+  });
+
   // Graceful shutdown
-  const shutdown = () => {
-    console.log("🛑 Shutdown signal received");
+  const shutdown = (signal) => {
+    console.log(`🛑 Shutdown signal received: ${signal}`);
     server.close(() => {
       console.log("👋 Server closed gracefully");
       process.exit(0);
@@ -112,13 +133,14 @@ try {
     }, 10000);
   };
 
-  process.on("SIGTERM", shutdown);
-  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", () => shutdown("SIGTERM"));
+  process.on("SIGINT", () => shutdown("SIGINT"));
 
-  // Keep alive heartbeat
+  // Keep alive heartbeat (더 자주 체크)
   setInterval(() => {
-    console.log(`💓 Server alive for ${Math.floor(process.uptime())} seconds`);
-  }, 60000);
+    const uptime = Math.floor(process.uptime());
+    console.log(`💓 Server alive for ${uptime} seconds`);
+  }, 30000);
 
   console.log("✅ === APP SETUP COMPLETE ===");
 } catch (err) {
