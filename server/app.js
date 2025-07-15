@@ -1,163 +1,307 @@
-import "./config/db.js";
-import path from "path";
-import { fileURLToPath } from "url";
-import { dirname } from "path";
-import express from "express";
-import cors from "cors";
-import swaggerUi from "swagger-ui-express";
-import fs from "fs";
-import authRoutes from "./routes/auth.js";
-import userRoutes from "./routes/users.js";
-import postRoutes from "./routes/posts.js";
-import commentRoutes from "./routes/comments.js";
-import followRoutes from "./routes/follows.js";
-import likeRoutes from "./routes/likes.js";
-import petRoutes from "./routes/pets.js";
-import reportRoutes from "./routes/report.js";
-import adminRoutes from "./routes/admin.js";
-import blockRoutes from "./routes/block.js";
-import anniversaryRoutes from "./routes/anniversary.js";
-import walkRoutes from "./routes/walk.js";
-
-console.log("🚀 Starting PetSNS application...");
+console.log("🚀 === APPLICATION STARTING ===");
+console.log("📍 Node version:", process.version);
+console.log("📍 Platform:", process.platform);
+console.log("📍 Working directory:", process.cwd());
 console.log("📍 Environment:", process.env.NODE_ENV);
 console.log("📍 Port:", process.env.PORT);
 
-const app = express();
-const allowedOrigins = ["http://localhost:5173", "https://petsns.vercel.app"];
+// Add error handling for imports
+console.log("📦 Starting imports...");
 
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      if (!origin || allowedOrigins.includes(origin)) {
-        callback(null, true);
-      } else {
-        callback(new Error("Not allowed by CORS"));
-      }
-    },
-    credentials: true,
-  })
-);
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
-app.use((req, res, next) => {
-  console.log("▶︎ REQUEST:", req.method, req.originalUrl);
-  next();
-});
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
-
-// Health check endpoint
-app.get("/health", (req, res) => {
-  res.status(200).json({
-    status: "OK",
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-  });
-});
-
-app.get("/", (req, res) => {
-  res.status(200).json({
-    message: "PetSNS API is running",
-    version: "1.0.0",
-    timestamp: new Date().toISOString(),
-  });
-});
-
-// Swagger 설정
-let swaggerDocument = {};
 try {
-  const swaggerPath = path.join(process.cwd(), "swagger-output.json");
-  if (fs.existsSync(swaggerPath)) {
-    const raw = fs.readFileSync(swaggerPath, "utf8");
-    swaggerDocument = JSON.parse(raw);
+  console.log("📦 Importing db config...");
+  await import("./config/db.js");
+  console.log("✅ DB config imported");
+} catch (err) {
+  console.error("❌ DB config import failed:", err.message);
+  console.error("Stack:", err.stack);
+  process.exit(1);
+}
 
-    // 불필요한 필드 제거
-    if (swaggerDocument.swagger) {
-      delete swaggerDocument.swagger;
-    }
-    console.log("✅ Swagger 문서 로드됨");
-  } else {
-    console.warn("⚠️ swagger-output.json 파일이 없습니다. Swagger 비활성화됨");
+try {
+  console.log("📦 Importing core modules...");
+  const path = await import("path");
+  const { fileURLToPath } = await import("url");
+  const { dirname } = path;
+  const express = await import("express");
+  const cors = await import("cors");
+  const swaggerUi = await import("swagger-ui-express");
+  const fs = await import("fs");
+
+  console.log("✅ Core modules imported");
+
+  console.log("📦 Importing route modules...");
+
+  // Import routes one by one to identify which one fails
+  let authRoutes,
+    userRoutes,
+    postRoutes,
+    commentRoutes,
+    followRoutes,
+    likeRoutes;
+  let petRoutes,
+    reportRoutes,
+    adminRoutes,
+    blockRoutes,
+    anniversaryRoutes,
+    walkRoutes;
+
+  try {
+    console.log("📦 Importing auth routes...");
+    authRoutes = await import("./routes/auth.js");
+    console.log("✅ Auth routes imported");
+  } catch (err) {
+    console.error("❌ Auth routes import failed:", err.message);
+    throw err;
   }
+
+  try {
+    console.log("📦 Importing user routes...");
+    userRoutes = await import("./routes/users.js");
+    console.log("✅ User routes imported");
+  } catch (err) {
+    console.error("❌ User routes import failed:", err.message);
+    throw err;
+  }
+
+  try {
+    console.log("📦 Importing post routes...");
+    postRoutes = await import("./routes/posts.js");
+    console.log("✅ Post routes imported");
+  } catch (err) {
+    console.error("❌ Post routes import failed:", err.message);
+    throw err;
+  }
+
+  try {
+    console.log("📦 Importing comment routes...");
+    commentRoutes = await import("./routes/comments.js");
+    console.log("✅ Comment routes imported");
+  } catch (err) {
+    console.error("❌ Comment routes import failed:", err.message);
+    throw err;
+  }
+
+  try {
+    console.log("📦 Importing follow routes...");
+    followRoutes = await import("./routes/follows.js");
+    console.log("✅ Follow routes imported");
+  } catch (err) {
+    console.error("❌ Follow routes import failed:", err.message);
+    throw err;
+  }
+
+  try {
+    console.log("📦 Importing like routes...");
+    likeRoutes = await import("./routes/likes.js");
+    console.log("✅ Like routes imported");
+  } catch (err) {
+    console.error("❌ Like routes import failed:", err.message);
+    throw err;
+  }
+
+  try {
+    console.log("📦 Importing pet routes...");
+    petRoutes = await import("./routes/pets.js");
+    console.log("✅ Pet routes imported");
+  } catch (err) {
+    console.error("❌ Pet routes import failed:", err.message);
+    throw err;
+  }
+
+  try {
+    console.log("📦 Importing report routes...");
+    reportRoutes = await import("./routes/report.js");
+    console.log("✅ Report routes imported");
+  } catch (err) {
+    console.error("❌ Report routes import failed:", err.message);
+    throw err;
+  }
+
+  try {
+    console.log("📦 Importing admin routes...");
+    adminRoutes = await import("./routes/admin.js");
+    console.log("✅ Admin routes imported");
+  } catch (err) {
+    console.error("❌ Admin routes import failed:", err.message);
+    throw err;
+  }
+
+  try {
+    console.log("📦 Importing block routes...");
+    blockRoutes = await import("./routes/block.js");
+    console.log("✅ Block routes imported");
+  } catch (err) {
+    console.error("❌ Block routes import failed:", err.message);
+    throw err;
+  }
+
+  try {
+    console.log("📦 Importing anniversary routes...");
+    anniversaryRoutes = await import("./routes/anniversary.js");
+    console.log("✅ Anniversary routes imported");
+  } catch (err) {
+    console.error("❌ Anniversary routes import failed:", err.message);
+    throw err;
+  }
+
+  try {
+    console.log("📦 Importing walk routes...");
+    walkRoutes = await import("./routes/walk.js");
+    console.log("✅ Walk routes imported");
+  } catch (err) {
+    console.error("❌ Walk routes import failed:", err.message);
+    throw err;
+  }
+
+  console.log("✅ All route modules imported successfully");
+
+  console.log("⚙️ Setting up Express app...");
+  const app = express.default();
+
+  const allowedOrigins = ["http://localhost:5173", "https://petsns.vercel.app"];
+
+  console.log("⚙️ Setting up CORS...");
+  app.use(
+    cors.default({
+      origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      },
+      credentials: true,
+    })
+  );
+
+  console.log("⚙️ Setting up middleware...");
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+
+  app.use((req, res, next) => {
+    console.log("▶︎ REQUEST:", req.method, req.originalUrl);
+    next();
+  });
+
+  app.use(express.default.json());
+  app.use(express.default.urlencoded({ extended: true }));
+  app.use("/uploads", express.default.static(path.join(__dirname, "uploads")));
+
+  console.log("⚙️ Setting up health check...");
+  app.get("/health", (req, res) => {
+    res.status(200).json({
+      status: "OK",
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+    });
+  });
+
+  app.get("/", (req, res) => {
+    res.status(200).json({
+      message: "PetSNS API is running",
+      version: "1.0.0",
+      timestamp: new Date().toISOString(),
+    });
+  });
+
+  console.log("⚙️ Setting up Swagger...");
+  let swaggerDocument = {};
+  try {
+    const swaggerPath = path.join(process.cwd(), "swagger-output.json");
+    if (fs.existsSync(swaggerPath)) {
+      const raw = fs.readFileSync(swaggerPath, "utf8");
+      swaggerDocument = JSON.parse(raw);
+
+      if (swaggerDocument.swagger) {
+        delete swaggerDocument.swagger;
+      }
+      console.log("✅ Swagger document loaded");
+    } else {
+      console.warn("⚠️ swagger-output.json not found. Swagger disabled");
+    }
+  } catch (err) {
+    console.warn("⚠️ Swagger setup failed:", err.message);
+  }
+
+  if (Object.keys(swaggerDocument).length > 0) {
+    app.use(
+      "/api-docs",
+      swaggerUi.default.serve,
+      swaggerUi.default.setup(swaggerDocument)
+    );
+  }
+
+  console.log("⚙️ Setting up API routes...");
+  app.use("/api/likes", likeRoutes.default);
+  app.use("/api/pets", petRoutes.default);
+  app.use("/api/posts", postRoutes.default);
+  app.use("/api/auth", authRoutes.default);
+  app.use("/api/users", userRoutes.default);
+  app.use("/api/comments", commentRoutes.default);
+  app.use("/api/follows", followRoutes.default);
+  app.use("/api/reports", reportRoutes.default);
+  app.use("/api/admin", adminRoutes.default);
+  app.use("/api/blocks", blockRoutes.default);
+  app.use("/api/anniversaries", anniversaryRoutes.default);
+  app.use("/api/walks", walkRoutes.default);
+  console.log("✅ All routes configured");
+
+  console.log("⚙️ Setting up error handlers...");
+  app.use((err, req, res, next) => {
+    console.error("❌ Server error:", err);
+    res.status(500).json({
+      message: "서버 에러",
+      error: process.env.NODE_ENV === "development" ? err.message : undefined,
+    });
+  });
+
+  app.use((req, res) => {
+    res.status(404).json({
+      message: "엔드포인트를 찾을 수 없습니다",
+      path: req.originalUrl,
+    });
+  });
+
+  console.log("🚀 Starting server...");
+  const PORT = process.env.PORT || 3000;
+
+  const server = app.listen(PORT, "0.0.0.0", () => {
+    console.log(`✅ Server successfully started on port ${PORT}`);
+    console.log(`🌐 Health check: http://localhost:${PORT}/health`);
+    console.log(`📚 API docs: http://localhost:${PORT}/api-docs`);
+  });
+
+  // Keep the process alive
+  process.on("SIGTERM", () => {
+    console.log("🛑 SIGTERM received. Shutting down gracefully...");
+    server.close(() => {
+      console.log("👋 Server closed");
+    });
+  });
+
+  process.on("SIGINT", () => {
+    console.log("🛑 SIGINT received. Shutting down gracefully...");
+    server.close(() => {
+      console.log("👋 Server closed");
+    });
+  });
+
+  console.log("✅ === APPLICATION FULLY STARTED ===");
 } catch (err) {
-  console.warn("⚠️ Swagger 설정 실패:", err.message);
+  console.error("❌ === APPLICATION STARTUP FAILED ===");
+  console.error("Error:", err.message);
+  console.error("Stack:", err.stack);
+  process.exit(1);
 }
 
-if (Object.keys(swaggerDocument).length > 0) {
-  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-}
-
-// API 라우트 설정
-try {
-  app.use("/api/likes", likeRoutes);
-  app.use("/api/pets", petRoutes);
-  app.use("/api/posts", postRoutes);
-  app.use("/api/auth", authRoutes);
-  app.use("/api/users", userRoutes);
-  app.use("/api/comments", commentRoutes);
-  app.use("/api/follows", followRoutes);
-  app.use("/api/reports", reportRoutes);
-  app.use("/api/admin", adminRoutes);
-  app.use("/api/blocks", blockRoutes);
-  app.use("/api/anniversaries", anniversaryRoutes);
-  app.use("/api/walks", walkRoutes);
-  console.log("✅ 모든 라우트 설정 완료");
-} catch (err) {
-  console.error("❌ 라우트 설정 실패:", err.message);
-}
-
-// 에러 핸들러
-app.use((err, req, res, next) => {
-  console.error("❌ 서버 에러:", err);
-  res.status(500).json({
-    message: "서버 에러",
-    error: process.env.NODE_ENV === "development" ? err.message : undefined,
-  });
-});
-
-// 404 핸들러
-app.use((req, res) => {
-  res.status(404).json({
-    message: "엔드포인트를 찾을 수 없습니다",
-    path: req.originalUrl,
-  });
-});
-
-// 서버 시작
-const PORT = process.env.PORT || 3000;
-
-const server = app.listen(PORT, "0.0.0.0", () => {
-  console.log(`✅ 서버가 포트 ${PORT}에서 실행 중입니다`);
-  console.log(`🌐 Health check: http://localhost:${PORT}/health`);
-});
-
-// Graceful shutdown
-process.on("SIGTERM", () => {
-  console.log("🛑 SIGTERM 신호 받음. 서버 종료 중...");
-  server.close(() => {
-    console.log("👋 서버가 정상적으로 종료되었습니다");
-  });
-});
-
-process.on("SIGINT", () => {
-  console.log("🛑 SIGINT 신호 받음. 서버 종료 중...");
-  server.close(() => {
-    console.log("👋 서버가 정상적으로 종료되었습니다");
-  });
-});
-
-// 예상치 못한 에러 처리
+// Handle unhandled errors
 process.on("uncaughtException", (err) => {
-  console.error("❌ 예상치 못한 에러:", err);
+  console.error("❌ Uncaught Exception:", err);
   process.exit(1);
 });
 
 process.on("unhandledRejection", (reason, promise) => {
-  console.error("❌ 처리되지 않은 Promise 거부:", reason);
-  // 즉시 종료하지 않고 로그만 남김
+  console.error("❌ Unhandled Rejection at:", promise, "reason:", reason);
+  process.exit(1);
 });
