@@ -83,6 +83,11 @@ try {
     console.log(`🏥 Health check: http://localhost:${PORT}/health`);
     console.log(`🧪 Test API: http://localhost:${PORT}/api/test`);
   });
+  // 모든 요청 로깅
+  app.use((req, res, next) => {
+    console.log(`📨 ${new Date().toISOString()} - ${req.method} ${req.url}`);
+    next();
+  });
 
   server.on("error", (err) => {
     console.error("❌ Server startup error:", err);
