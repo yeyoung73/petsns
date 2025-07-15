@@ -38,8 +38,6 @@ app.use(
   })
 );
 
-app.use(cors({ origin: "http://localhost:5173", credentials: true }));
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
