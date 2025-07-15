@@ -57,18 +57,18 @@ try {
     "utf8"
   );
   swaggerDocument = JSON.parse(raw);
-  if (swaggerDocument.swagger) delete swaggerDocument.swagger;
+
+  // 불필요한 필드 제거
+  if (swaggerDocument.swagger) {
+    delete swaggerDocument.swagger;
+  }
 } catch (err) {
-  console.warn("⚠️ swagger-output.json 파일을 읽을 수 없습니다:", err.message);
+  console.warn("⚠️ swagger-output.json 파일이 없습니다. Swagger 비활성화됨");
 }
 
-// ここで余分な swagger フィールドを消す
-if (swaggerDocument.swagger) {
-  delete swaggerDocument.swagger;
+if (Object.keys(swaggerDocument).length > 0) {
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 }
-
-app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
-
 app.use("/api/likes", likeRoutes);
 app.use("/api/pets", petRoutes);
 app.use("/api/posts", postRoutes);
