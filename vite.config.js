@@ -27,4 +27,7 @@ export default defineConfig({
       process.env.VITE_API_URL || "https://petsns-production.up.railway.app"
     ),
   },
+  server: {
+    historyApiFallback: true, // 개발 서버용
+  },
 });
