@@ -159,7 +159,7 @@ try {
   console.log("⚙️ Setting up Express app...");
   const app = express.default();
 
-  const allowedOrigins = ["http://localhost:5173", "https://petsns.vercel.app"];
+  const allowedOrigins = ["http://localhost:5173", "https://public.vercel.app"];
 
   console.log("⚙️ Setting up CORS...");
   app.use(

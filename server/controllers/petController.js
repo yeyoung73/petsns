@@ -129,7 +129,7 @@ export const getPetList = async (req, res) => {
 
     const { rows } = await pool.query(
       `SELECT pet_id, name, species, breed, gender, birthday, profile_image, created_at
-       FROM petsns.pets
+       FROM public.pets
        WHERE owner_id = $1
        ORDER BY created_at DESC`,
       [userId]

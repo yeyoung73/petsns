@@ -16,7 +16,7 @@ interface CommentNode {
   created_at: string;
   children: CommentNode[];
   is_deleted: boolean;
-  profile_image?: string; // 선택적 이미지
+  profile_image?: string;
 }
 
 type Props = {
@@ -25,6 +25,7 @@ type Props = {
   onDelete: (id: number) => void;
   onUpdate: (id: number, content: string) => void;
   onReplySuccess: () => void;
+  depth?: number; // 댓글 깊이 추가
 };
 
 const CommentItem: React.FC<Props> = ({
@@ -33,21 +34,28 @@ const CommentItem: React.FC<Props> = ({
   onDelete,
   onUpdate,
   onReplySuccess,
+  depth = 0,
 }) => {
   const [reply, setReply] = useState("");
   const [showReplyBox, setShowReplyBox] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // 삭제된 댓글이고 자식이 없으면 렌더링하지 않음
   if (comment.is_deleted && comment.children.length === 0) {
     return null;
   }
+
   const createdDate = new Date(comment.created_at);
   const hoursDiff = differenceInHours(new Date(), createdDate);
   const timeDisplay =
     hoursDiff < 24
-      ? formatDistanceToNow(createdDate, { addSuffix: true, locale: ko }) // 예: "3시간 전"
-      : format(createdDate, "yyyy.MM.dd"); // 예: "2024.07.08"
+      ? formatDistanceToNow(createdDate, { addSuffix: true, locale: ko })
+      : format(createdDate, "yyyy.MM.dd");
 
   const handleReply = async () => {
-    if (!reply.trim()) return;
+    if (!reply.trim() || isSubmitting) return;
+
+    setIsSubmitting(true);
     try {
       const token = localStorage.getItem("token");
       const res = await fetch("/api/comments", {
@@ -63,12 +71,19 @@ const CommentItem: React.FC<Props> = ({
         }),
       });
 
-      if (!res.ok) throw new Error("답글 작성 실패");
+      if (!res.ok) {
+        const errorData = await res.json();
+        throw new Error(errorData.message || "답글 작성 실패");
+      }
+
       setReply("");
       setShowReplyBox(false);
       onReplySuccess();
-    } catch (err) {
-      alert("답글 작성에 실패했습니다.");
+    } catch (err: any) {
+      console.error("답글 작성 오류:", err);
+      alert(err.message || "답글 작성에 실패했습니다.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -81,7 +96,7 @@ const CommentItem: React.FC<Props> = ({
 
     try {
       const token = localStorage.getItem("token");
-      await fetch("/api/reports", {
+      const res = await fetch("/api/reports", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -93,6 +108,8 @@ const CommentItem: React.FC<Props> = ({
           reason,
         }),
       });
+
+      if (!res.ok) throw new Error("신고 실패");
       alert("신고가 접수되었습니다.");
     } catch (err) {
       console.error("신고 실패:", err);
@@ -100,10 +117,21 @@ const CommentItem: React.FC<Props> = ({
     }
   };
 
-  console.log("💬 댓글 데이터:", comment);
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+      handleReply();
+    }
+  };
+
+  // 깊이에 따른 스타일 클래스
+  const getDepthClass = () => {
+    if (depth === 0) return styles.rootComment;
+    if (depth === 1) return styles.firstReply;
+    return styles.deepReply;
+  };
 
   return (
-    <li className={styles.commentItem}>
+    <li className={`${styles.commentItem} ${getDepthClass()}`}>
       <div className={styles.commentHeader}>
         <Link to={`/users/${comment.user_id}`} className={styles.userLink}>
           {comment.profile_image ? (
@@ -120,63 +148,78 @@ const CommentItem: React.FC<Props> = ({
         <span className={styles.timestamp}>{timeDisplay}</span>
       </div>
 
-      <p className={styles.content}>
+      <div className={styles.content}>
         {comment.is_deleted ? (
           comment.children.length > 0 ? (
-            <i>삭제된 댓글입니다</i>
+            <i className={styles.deletedText}>삭제된 댓글입니다</i>
           ) : null
         ) : (
-          comment.content
-        )}
-      </p>
-
-      <div className={styles.actions}>
-        {!comment.is_deleted && (
-          <>
-            <button
-              onClick={() => setShowReplyBox(!showReplyBox)}
-              className={styles.actionBtn}
-            >
-              답글
-            </button>
-            {currentUserId === comment.user_id && (
-              <>
-                <button
-                  onClick={() => onUpdate(comment.id, comment.content)}
-                  className={styles.actionBtn}
-                >
-                  수정
-                </button>
-                <button
-                  onClick={() => onDelete(comment.id)}
-                  className={styles.actionBtn}
-                >
-                  삭제
-                </button>
-              </>
-            )}
-            <button
-              onClick={() => handleReport("comment", comment.id)}
-              className={styles.reportButton}
-            >
-              🚨 신고
-            </button>
-          </>
+          <p className={styles.contentText}>{comment.content}</p>
         )}
       </div>
+
+      {!comment.is_deleted && (
+        <div className={styles.actions}>
+          <button
+            onClick={() => setShowReplyBox(!showReplyBox)}
+            className={styles.actionBtn}
+          >
+            답글
+          </button>
+          {currentUserId === comment.user_id && (
+            <>
+              <button
+                onClick={() => onUpdate(comment.id, comment.content)}
+                className={styles.actionBtn}
+              >
+                수정
+              </button>
+              <button
+                onClick={() => onDelete(comment.id)}
+                className={styles.actionBtn}
+              >
+                삭제
+              </button>
+            </>
+          )}
+          <button
+            onClick={() => handleReport("comment", comment.id)}
+            className={styles.reportButton}
+          >
+            🚨 신고
+          </button>
+        </div>
+      )}
 
       {showReplyBox && (
         <div className={styles.replyBox}>
           <textarea
             value={reply}
             onChange={(e) => setReply(e.target.value)}
+            onKeyDown={handleKeyPress}
             rows={2}
-            placeholder="답글을 입력하세요..."
+            placeholder="답글을 입력하세요... (Ctrl+Enter로 작성)"
             className={styles.replyInput}
+            disabled={isSubmitting}
           />
-          <button onClick={handleReply} className={styles.replySubmit}>
-            작성
-          </button>
+          <div className={styles.replyActions}>
+            <button
+              onClick={handleReply}
+              className={styles.replySubmit}
+              disabled={isSubmitting || !reply.trim()}
+            >
+              {isSubmitting ? "작성 중..." : "작성"}
+            </button>
+            <button
+              onClick={() => {
+                setShowReplyBox(false);
+                setReply("");
+              }}
+              className={styles.replyCancel}
+            >
+              취소
+            </button>
+          </div>
         </div>
       )}
 
@@ -190,6 +233,7 @@ const CommentItem: React.FC<Props> = ({
               onDelete={onDelete}
               onUpdate={onUpdate}
               onReplySuccess={onReplySuccess}
+              depth={depth + 1}
             />
           ))}
         </ul>

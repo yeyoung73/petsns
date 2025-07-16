@@ -6,6 +6,7 @@ function buildCommentTree(comments) {
   const map = new Map();
   const roots = [];
 
+  // 1단계: 모든 댓글을 Map에 저장하고 children 배열 초기화
   comments.forEach((comment) => {
     map.set(comment.comment_id, {
       ...comment,
@@ -14,21 +15,36 @@ function buildCommentTree(comments) {
     });
   });
 
+  // 2단계: 부모-자식 관계 설정
   comments.forEach((comment) => {
     const node = map.get(comment.comment_id);
+
     if (comment.parent_id) {
       const parent = map.get(comment.parent_id);
       if (parent) {
+        // 부모가 존재하면 자식으로 추가
         parent.children.push(node);
       } else {
-        // ✅ 부모가 없으면 루트로 간주 (삭제된 부모로 인해 고아가 된 대댓글)
+        // 부모가 없으면 루트로 간주 (삭제된 부모로 인해 고아가 된 대댓글)
         roots.push(node);
       }
     } else {
+      // parent_id가 null이면 루트 댓글
       roots.push(node);
     }
   });
 
+  // 3단계: 각 레벨에서 created_at 기준으로 정렬
+  const sortCommentsByDate = (commentList) => {
+    commentList.sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+    commentList.forEach((comment) => {
+      if (comment.children.length > 0) {
+        sortCommentsByDate(comment.children);
+      }
+    });
+  };
+
+  sortCommentsByDate(roots);
   return roots;
 }
 
@@ -45,11 +61,11 @@ export async function getCommentsByPostId(postId, userId) {
       c.content, 
       c.created_at, 
       c.is_deleted
-    FROM petsns.comments c
-    LEFT JOIN petsns.users u ON c.user_id = u.user_id
+    FROM public.comments c
+    LEFT JOIN public.users u ON c.user_id = u.user_id
     WHERE c.post_id = $1
       AND c.user_id NOT IN (
-        SELECT blocked_id FROM petsns.blocks WHERE blocker_id = $2
+        SELECT blocked_id FROM public.blocks WHERE blocker_id = $2
       )
     ORDER BY c.created_at ASC
   `,
@@ -61,8 +77,8 @@ export async function getCommentsByPostId(postId, userId) {
 // 댓글 또는 대댓글 생성
 export const createComment = async ({ postId, userId, parentId, content }) => {
   const query = `
-    INSERT INTO petsns.comments (post_id, user_id, parent_id, content)
-    VALUES ($1, $2, $3, $4)
+    INSERT INTO public.comments (post_id, user_id, parent_id, content, created_at)
+    VALUES ($1, $2, $3, $4, now())
     RETURNING *
   `;
   const { rows } = await pool.query(query, [
@@ -77,7 +93,7 @@ export const createComment = async ({ postId, userId, parentId, content }) => {
 // 댓글 수정
 export const updateCommentById = async ({ commentId, userId, content }) => {
   const query = `
-    UPDATE petsns.comments
+    UPDATE public.comments
     SET content = $1
     WHERE comment_id = $2 AND user_id = $3
   `;
@@ -90,19 +106,19 @@ export async function softDeleteCommentById(commentId) {
   try {
     // 대댓글이 있는지 확인
     const childResult = await client.query(
-      `SELECT 1 FROM petsns.comments WHERE parent_id = $1 LIMIT 1`,
+      `SELECT 1 FROM public.comments WHERE parent_id = $1 LIMIT 1`,
       [commentId]
     );
 
     if (childResult.rowCount > 0) {
       // 대댓글이 있으면 소프트 삭제
       await client.query(
-        `UPDATE petsns.comments SET is_deleted = true WHERE comment_id = $1`,
+        `UPDATE public.comments SET is_deleted = true WHERE comment_id = $1`,
         [commentId]
       );
     } else {
       // 대댓글이 없으면 하드 삭제
-      await client.query(`DELETE FROM petsns.comments WHERE comment_id = $1`, [
+      await client.query(`DELETE FROM public.comments WHERE comment_id = $1`, [
         commentId,
       ]);
     }

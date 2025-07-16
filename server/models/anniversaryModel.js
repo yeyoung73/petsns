@@ -8,7 +8,7 @@ export const insertAnniversary = async ({
   image,
 }) => {
   const result = await db.query(
-    `INSERT INTO petsns.anniversaries (pet_id, title, date, memo, image)
+    `INSERT INTO public.anniversaries (pet_id, title, date, memo, image)
      VALUES ($1, $2, $3, $4, $5)
      RETURNING *`,
     [pet_id, title, date, memo, image]
@@ -18,7 +18,7 @@ export const insertAnniversary = async ({
 
 export const findAnniversariesByPet = async (petId) => {
   const result = await db.query(
-    `SELECT * FROM petsns.anniversaries
+    `SELECT * FROM public.anniversaries
      WHERE pet_id = $1
      ORDER BY date ASC`,
     [petId]
@@ -28,7 +28,7 @@ export const findAnniversariesByPet = async (petId) => {
 
 export const removeAnniversary = async (id) => {
   const result = await db.query(
-    `DELETE FROM petsns.anniversaries WHERE anniversary_id = $1`,
+    `DELETE FROM public.anniversaries WHERE anniversary_id = $1`,
     [id]
   );
   return result.rowCount > 0;
@@ -36,7 +36,7 @@ export const removeAnniversary = async (id) => {
 
 export const findUpcomingAnniversaries = async () => {
   const result = await db.query(
-    `SELECT * FROM "petsns"."anniversaries"
+    `SELECT * FROM public.anniversaries
      WHERE date >= CURRENT_DATE
        AND date <= CURRENT_DATE + INTERVAL '7 days'
      ORDER BY date ASC`

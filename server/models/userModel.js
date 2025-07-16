@@ -5,7 +5,7 @@ import pool from "../config/db.js";
 export async function getUserByEmail(email) {
   const { rows } = await pool.query(
     `SELECT user_id, username, email, password, is_admin
-      FROM petsns.users
+      FROM public.users
       WHERE email = $1`,
     [email]
   );
@@ -15,7 +15,7 @@ export async function getUserByEmail(email) {
 // 2) 회원가입용 삽입
 export async function insertUser(username, email, passwordHash) {
   const { rows } = await pool.query(
-    `INSERT INTO petsns.users
+    `INSERT INTO public.users
        (username, email, password, email_verified, created_at)
      VALUES ($1, $2, $3, false, NOW())
      RETURNING user_id, username, email`,
@@ -27,7 +27,7 @@ export async function insertUser(username, email, passwordHash) {
 // 3) 이메일 인증 완료 flag 업데이트
 export async function verifyUserEmail(userId) {
   await pool.query(
-    `UPDATE petsns.users 
+    `UPDATE public.users 
         SET email_verified = true
       WHERE user_id = $1`,
     [userId]
@@ -37,7 +37,7 @@ export async function verifyUserEmail(userId) {
 export async function getUserById(userId) {
   const { rows } = await pool.query(
     `SELECT user_id, username, email, profile_image, bio, created_at
-       FROM petsns.users
+       FROM public.users
       WHERE user_id = $1`,
     [userId]
   );
@@ -73,7 +73,7 @@ export async function updateUserProfile(userId, updates) {
 
   const { rows } = await pool.query(
     `
-    UPDATE petsns.users
+    UPDATE public.users
        SET ${fields.join(", ")}
      WHERE user_id = $${index}
      RETURNING user_id, username, email, profile_image, bio, created_at
@@ -87,7 +87,7 @@ export async function updateUserProfile(userId, updates) {
 // 사용자 삭제
 export async function deleteUserById(userId) {
   const { rowCount } = await pool.query(
-    `DELETE FROM petsns.users WHERE user_id = $1`,
+    `DELETE FROM public.users WHERE user_id = $1`,
     [userId]
   );
   return rowCount > 0; // true if deleted

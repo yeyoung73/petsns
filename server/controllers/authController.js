@@ -136,7 +136,7 @@ export const handleGetProfile = async (req, res) => {
   const userId = req.user.userId;
 
   const result = await db.query(
-    "SELECT user_id, username, email FROM petsns.users WHERE user_id = $1",
+    "SELECT user_id, username, email FROM public.users WHERE user_id = $1",
     [userId]
   );
 
