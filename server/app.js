@@ -305,7 +305,10 @@ try {
   app.use("/api/reports", reportRoutes.default);
   app.use("/api/blocks", blockRoutes.default);
   app.use("/api/admin", adminRoutes.default);
-
+  fetch("https://petsns-production.up.railway.app/api/test")
+    .then((response) => response.json())
+    .then((data) => console.log("✅ 성공:", data))
+    .catch((error) => console.error("❌ 실패:", error));
   console.log("✅ All routes configured");
 
   // 🔥 수정: 더 나은 에러 핸들링
