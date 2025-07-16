@@ -177,7 +177,7 @@ try {
     "http://localhost:5173",
     "http://localhost:3000",
     "https://petsns.vercel.app",
-    "https://ample-benevolence-production.up.railway.app", // 실제 프론트엔드 도메인으로 변경
+    "https://sparkling-creation-production.up.railway.app/, // 실제 프론트엔드 도메인으로 변경
     process.env.FRONTEND_URL, // 환경변수로 설정 가능
   ].filter(Boolean);
 
