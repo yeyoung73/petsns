@@ -52,10 +52,10 @@ const HomePage: React.FC = () => {
 
         console.log(`📡 API 요청 중: ${url}`);
 
-        // fetch 대신 api 인스턴스 사용 (기념일 API처럼)
+        // api 인스턴스 사용 (디버깅에서 확인된 정상 작동 방식)
         const res = await api.get(url);
 
-        console.log(`📊 응답 상태: 성공`);
+        console.log(`✅ 응답 성공 - ${res.data.length}개 게시글`);
         console.log("📝 받은 게시글 데이터:", res.data);
 
         if (Array.isArray(res.data)) {
@@ -69,7 +69,7 @@ const HomePage: React.FC = () => {
 
         // axios 에러 처리
         if (err.response?.status === 401) {
-          // 토큰이 만료되었거나 유효하지 않음
+          console.log("🔑 토큰 만료 - 로그인 페이지로 이동");
           localStorage.removeItem("token");
           localStorage.removeItem("username");
           localStorage.removeItem("is_admin");
