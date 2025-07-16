@@ -1,86 +1,121 @@
 // config/db.js
-console.log("📦 Loading database configuration...");
-
-import dotenv from "dotenv";
-dotenv.config();
-
 import pkg from "pg";
 const { Pool } = pkg;
 
-console.log("📊 Database environment variables:");
-console.log("  PGHOST:", process.env.DB_HOST ? "✅ Set" : "❌ Missing");
-console.log("  PGDATABASE:", process.env.DB_DATABASE ? "✅ Set" : "❌ Missing");
-console.log("  PGUSER:", process.env.DB_USER ? "✅ Set" : "❌ Missing");
-console.log("  PGPASSWORD:", process.env.DB_PASSWORD ? "✅ Set" : "❌ Missing");
-console.log("  PGPORT:", process.env.DB_PORT || 5432);
-
-// 날짜 파싱 (1082: date 타입)
-pkg.types.setTypeParser(1082, (val) => val);
-
-let pool;
-
+// 🔥 수정: dotenv를 조건부로 로드
 try {
-  // 연결 풀 생성
-  pool = new Pool({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    database: process.env.DB_DATABASE,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    ssl:
-      process.env.NODE_ENV === "production"
-        ? { rejectUnauthorized: false }
-        : false,
-    connectionTimeoutMillis: 10000,
-    idleTimeoutMillis: 30000,
-    max: 10,
-  });
-
-  console.log("✅ Database pool created successfully");
-
-  // 스키마 설정
-  pool.on("connect", (client) => {
-    console.log("🔗 Client connected to database");
-    client.query("SET search_path TO petsns").catch((err) => {
-      console.warn("⚠️ Failed to set search_path:", err.message);
-    });
-  });
-
-  pool.on("error", (err) => {
-    console.error("❌ Database pool error:", err.message);
-  });
-
-  // 연결 테스트 (비동기, 실패해도 서버 시작은 계속)
-  setTimeout(async () => {
-    try {
-      console.log("🔄 Testing database connection...");
-      const client = await pool.connect();
-      console.log("🎉 Database connection successful!");
-
-      // 스키마 생성
-      await client.query("CREATE SCHEMA IF NOT EXISTS petsns");
-      console.log("✅ Schema petsns ready");
-
-      client.release();
-    } catch (err) {
-      console.error("❌ Database connection test failed:", err.message);
-      console.error(
-        "⚠️ Server will continue but database features may not work"
-      );
-    }
-  }, 1000);
+  if (process.env.NODE_ENV === "development") {
+    const dotenv = await import("dotenv");
+    dotenv.config();
+  }
 } catch (err) {
-  console.error("❌ Failed to create database pool:", err.message);
-  console.error("⚠️ Creating mock pool for development");
-
-  // Create a mock pool that won't crash the app
-  pool = {
-    connect: () => Promise.reject(new Error("Database not available")),
-    query: () => Promise.reject(new Error("Database not available")),
-    on: () => {},
-  };
+  console.log("⚠️ Using system environment variables");
 }
 
-console.log("✅ Database configuration loaded");
+console.log("🔍 데이터베이스 환경변수 확인:");
+console.log(
+  "DATABASE_URL:",
+  process.env.DATABASE_URL ? "✅ 설정됨" : "❌ 누락"
+);
+console.log(
+  "DATABASE_URL 시작:",
+  process.env.DATABASE_URL
+    ? process.env.DATABASE_URL.substring(0, 30) + "..."
+    : "None"
+);
+console.log("NODE_ENV:", process.env.NODE_ENV);
+
+// 🔥 수정: Railway 환경변수 직접 참조
+let connectionString = process.env.DATABASE_URL;
+
+// Railway 환경변수 패턴 확인
+const railwayVars = Object.keys(process.env).filter(
+  (key) =>
+    key.startsWith("PGHOST") ||
+    key.startsWith("PGDATABASE") ||
+    key.startsWith("PGUSER") ||
+    key.startsWith("PGPASSWORD")
+);
+console.log("🔧 Railway DB 환경변수:", railwayVars);
+
+// 만약 DATABASE_URL이 없다면 개별 환경변수로 구성
+if (!connectionString) {
+  const PGHOST = process.env.PGHOST;
+  const PGDATABASE = process.env.PGDATABASE;
+  const PGUSER = process.env.PGUSER;
+  const PGPASSWORD = process.env.PGPASSWORD;
+  const PGPORT = process.env.PGPORT || 5432;
+
+  if (PGHOST && PGDATABASE && PGUSER && PGPASSWORD) {
+    connectionString = `postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${PGDATABASE}?sslmode=require`;
+    console.log("🔧 개별 환경변수로 연결 문자열 구성");
+  }
+}
+
+if (!connectionString) {
+  console.error("❌ 데이터베이스 연결 정보가 없습니다!");
+  process.exit(1);
+}
+
+// 데이터베이스 연결 설정
+const pool = new Pool({
+  connectionString: connectionString,
+  ssl:
+    process.env.NODE_ENV === "production"
+      ? { rejectUnauthorized: false }
+      : false,
+  max: 20,
+  idleTimeoutMillis: 30000,
+  connectionTimeoutMillis: 2000,
+});
+
+// 연결 이벤트 핸들러
+pool.on("connect", (client) => {
+  console.log("✅ 데이터베이스 연결 성공");
+
+  // 연결 정보 확인
+  client.query(
+    "SELECT current_database(), current_user, current_schema()",
+    (err, result) => {
+      if (!err) {
+        console.log("📍 연결된 데이터베이스:", result.rows[0]);
+      }
+    }
+  );
+});
+
+pool.on("error", (err) => {
+  console.error("❌ 데이터베이스 연결 에러:", err);
+});
+
+// 연결 테스트 함수
+export async function testConnection() {
+  try {
+    const client = await pool.connect();
+
+    // 기본 정보 확인
+    const info = await client.query(
+      "SELECT current_database(), current_user, current_schema()"
+    );
+    console.log("📊 데이터베이스 정보:", info.rows[0]);
+
+    // 테이블 존재 확인
+    const tables = await client.query(`
+      SELECT table_name FROM information_schema.tables 
+      WHERE table_schema = 'public' AND table_type = 'BASE TABLE'
+      ORDER BY table_name
+    `);
+    console.log(
+      "📋 존재하는 테이블:",
+      tables.rows.map((row) => row.table_name)
+    );
+
+    client.release();
+    return true;
+  } catch (error) {
+    console.error("❌ 데이터베이스 테스트 실패:", error.message);
+    return false;
+  }
+}
 
 export default pool;
