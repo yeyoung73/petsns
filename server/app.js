@@ -1,142 +1,307 @@
-import express from "express";
-import cors from "cors";
-import dotenv from "dotenv";
+console.log("🚀 === APPLICATION STARTING ===");
+console.log("📍 Node version:", process.version);
+console.log("📍 Platform:", process.platform);
+console.log("📍 Working directory:", process.cwd());
+console.log("📍 Environment:", process.env.NODE_ENV);
+console.log("📍 Port:", process.env.PORT);
 
-dotenv.config();
+// Add error handling for imports
+console.log("📦 Starting imports...");
 
-const app = express();
-const PORT = process.env.PORT || 8080;
-const HOST = process.env.HOST || "0.0.0.0";
-
-// 미들웨어 설정
-app.use(cors());
-app.use(express.json());
-
-// 서버 시작 시간 기록
-const startTime = Date.now();
-
-// Health check endpoint
-app.get("/health", (req, res) => {
-  const healthData = {
-    status: "healthy",
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    memory: process.memoryUsage(),
-    pid: process.pid,
-    environment: process.env.NODE_ENV || "production",
-  };
-
-  console.log(`📨 ${new Date().toISOString()} - GET /health from ${req.ip}`);
-  console.log("📨 Health check request");
-
-  res.status(200).json(healthData);
-});
-
-// Railway용 준비성 체크
-app.get("/ready", (req, res) => {
-  res.status(200).json({
-    status: "ready",
-    timestamp: new Date().toISOString(),
-  });
-});
-
-// Test API endpoint
-app.get("/api/test", (req, res) => {
-  res.json({ message: "PETSNS API is working!" });
-});
-
-// 서버 시작 (server 변수에 할당하여 나중에 graceful shutdown에서 사용)
-console.log("🚀 === PETSNS API STARTING ===");
-console.log(`📍 Node version: ${process.version}`);
-console.log(`📍 Platform: ${process.platform}`);
-console.log(`📍 Working directory: ${process.cwd()}`);
-console.log(`📍 Environment: ${process.env.NODE_ENV || "production"}`);
-console.log(`📍 Port: ${PORT}`);
-
-if (process.env.RAILWAY_PUBLIC_DOMAIN) {
-  console.log("📍 Railway vars: {");
-  console.log(
-    ` RAILWAY_PUBLIC_DOMAIN: '${process.env.RAILWAY_PUBLIC_DOMAIN}',`
-  );
-  console.log(
-    ` RAILWAY_PRIVATE_DOMAIN: '${process.env.RAILWAY_PRIVATE_DOMAIN}'`
-  );
-  console.log("}");
+try {
+  console.log("📦 Importing db config...");
+  await import("./config/db.js");
+  console.log("✅ DB config imported");
+} catch (err) {
+  console.error("❌ DB config import failed:", err.message);
+  console.error("Stack:", err.stack);
+  process.exit(1);
 }
 
-console.log("📦 Importing express...");
-console.log("✅ Express imported successfully");
-console.log(`🚀 Attempting to start server on ${HOST}:${PORT}...`);
+try {
+  console.log("📦 Importing core modules...");
+  const path = await import("path");
+  const { fileURLToPath } = await import("url");
+  const { dirname } = path;
+  const express = await import("express");
+  const cors = await import("cors");
+  const swaggerUi = await import("swagger-ui-express");
+  const fs = await import("fs");
 
-const server = app.listen(PORT, HOST, () => {
-  console.log("✅ === APP SETUP COMPLETE ===");
-  console.log("✅ === SERVER SUCCESSFULLY STARTED ===");
-  console.log(`🌐 Server running on ${HOST}:${PORT}`);
-  console.log(`🏥 Health check: http://${HOST}:${PORT}/health`);
-  console.log(`🧪 Test API: http://${HOST}:${PORT}/api/test`);
-  console.log("✅ Production server ready for external connections");
-  console.log(`🎯 Server is actively listening on ${HOST}:${PORT}`);
-});
+  console.log("✅ Core modules imported");
 
-// 30초마다 서버 생존 확인
-setInterval(() => {
-  const uptimeSeconds = Math.floor((Date.now() - startTime) / 1000);
-  console.log(`💓 Server alive for ${uptimeSeconds} seconds`);
-}, 30000);
+  console.log("📦 Importing route modules...");
 
-// 1분마다 메모리 사용량 로그
-setInterval(() => {
-  const memUsage = process.memoryUsage();
-  const memUsageMB = {
-    rss: Math.round(memUsage.rss / 1024 / 1024),
-    heapTotal: Math.round(memUsage.heapTotal / 1024 / 1024),
-    heapUsed: Math.round(memUsage.heapUsed / 1024 / 1024),
-    external: Math.round(memUsage.external / 1024 / 1024),
-  };
-  console.log(`📊 Memory usage (MB):`, memUsageMB);
-}, 60000);
+  // Import routes one by one to identify which one fails
+  let authRoutes,
+    userRoutes,
+    postRoutes,
+    commentRoutes,
+    followRoutes,
+    likeRoutes;
+  let petRoutes,
+    reportRoutes,
+    adminRoutes,
+    blockRoutes,
+    anniversaryRoutes,
+    walkRoutes;
 
-// Graceful shutdown 처리
-const gracefulShutdown = (signal) => {
-  console.log(`\n🛑 Received ${signal}. Starting graceful shutdown...`);
-
-  if (server) {
-    server.close((err) => {
-      if (err) {
-        console.error("❌ Error during server shutdown:", err);
-        process.exit(1);
-      }
-      console.log("✅ Server closed successfully");
-      process.exit(0);
-    });
-
-    // 10초 후 강제 종료
-    setTimeout(() => {
-      console.log("⏰ Forcing shutdown after timeout");
-      process.exit(1);
-    }, 10000);
-  } else {
-    process.exit(0);
+  try {
+    console.log("📦 Importing auth routes...");
+    authRoutes = await import("./routes/auth.js");
+    console.log("✅ Auth routes imported");
+  } catch (err) {
+    console.error("❌ Auth routes import failed:", err.message);
+    throw err;
   }
-};
 
-// 시그널 처리
-process.on("SIGTERM", () => gracefulShutdown("SIGTERM"));
-process.on("SIGINT", () => gracefulShutdown("SIGINT"));
-process.on("SIGQUIT", () => gracefulShutdown("SIGQUIT"));
+  try {
+    console.log("📦 Importing user routes...");
+    userRoutes = await import("./routes/users.js");
+    console.log("✅ User routes imported");
+  } catch (err) {
+    console.error("❌ User routes import failed:", err.message);
+    throw err;
+  }
 
-// 예외 처리
+  try {
+    console.log("📦 Importing post routes...");
+    postRoutes = await import("./routes/posts.js");
+    console.log("✅ Post routes imported");
+  } catch (err) {
+    console.error("❌ Post routes import failed:", err.message);
+    throw err;
+  }
+
+  try {
+    console.log("📦 Importing comment routes...");
+    commentRoutes = await import("./routes/comments.js");
+    console.log("✅ Comment routes imported");
+  } catch (err) {
+    console.error("❌ Comment routes import failed:", err.message);
+    throw err;
+  }
+
+  try {
+    console.log("📦 Importing follow routes...");
+    followRoutes = await import("./routes/follows.js");
+    console.log("✅ Follow routes imported");
+  } catch (err) {
+    console.error("❌ Follow routes import failed:", err.message);
+    throw err;
+  }
+
+  try {
+    console.log("📦 Importing like routes...");
+    likeRoutes = await import("./routes/likes.js");
+    console.log("✅ Like routes imported");
+  } catch (err) {
+    console.error("❌ Like routes import failed:", err.message);
+    throw err;
+  }
+
+  try {
+    console.log("📦 Importing pet routes...");
+    petRoutes = await import("./routes/pets.js");
+    console.log("✅ Pet routes imported");
+  } catch (err) {
+    console.error("❌ Pet routes import failed:", err.message);
+    throw err;
+  }
+
+  try {
+    console.log("📦 Importing report routes...");
+    reportRoutes = await import("./routes/report.js");
+    console.log("✅ Report routes imported");
+  } catch (err) {
+    console.error("❌ Report routes import failed:", err.message);
+    throw err;
+  }
+
+  try {
+    console.log("📦 Importing admin routes...");
+    adminRoutes = await import("./routes/admin.js");
+    console.log("✅ Admin routes imported");
+  } catch (err) {
+    console.error("❌ Admin routes import failed:", err.message);
+    throw err;
+  }
+
+  try {
+    console.log("📦 Importing block routes...");
+    blockRoutes = await import("./routes/block.js");
+    console.log("✅ Block routes imported");
+  } catch (err) {
+    console.error("❌ Block routes import failed:", err.message);
+    throw err;
+  }
+
+  try {
+    console.log("📦 Importing anniversary routes...");
+    anniversaryRoutes = await import("./routes/anniversary.js");
+    console.log("✅ Anniversary routes imported");
+  } catch (err) {
+    console.error("❌ Anniversary routes import failed:", err.message);
+    throw err;
+  }
+
+  try {
+    console.log("📦 Importing walk routes...");
+    walkRoutes = await import("./routes/walk.js");
+    console.log("✅ Walk routes imported");
+  } catch (err) {
+    console.error("❌ Walk routes import failed:", err.message);
+    throw err;
+  }
+
+  console.log("✅ All route modules imported successfully");
+
+  console.log("⚙️ Setting up Express app...");
+  const app = express.default();
+
+  const allowedOrigins = ["http://localhost:5173", "https://petsns.vercel.app"];
+
+  console.log("⚙️ Setting up CORS...");
+  app.use(
+    cors.default({
+      origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+          callback(null, true);
+        } else {
+          callback(new Error("Not allowed by CORS"));
+        }
+      },
+      credentials: true,
+    })
+  );
+
+  console.log("⚙️ Setting up middleware...");
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = dirname(__filename);
+
+  app.use((req, res, next) => {
+    console.log("▶︎ REQUEST:", req.method, req.originalUrl);
+    next();
+  });
+
+  app.use(express.default.json());
+  app.use(express.default.urlencoded({ extended: true }));
+  app.use("/uploads", express.default.static(path.join(__dirname, "uploads")));
+
+  console.log("⚙️ Setting up health check...");
+  app.get("/health", (req, res) => {
+    res.status(200).json({
+      status: "OK",
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+    });
+  });
+
+  app.get("/", (req, res) => {
+    res.status(200).json({
+      message: "PetSNS API is running",
+      version: "1.0.0",
+      timestamp: new Date().toISOString(),
+    });
+  });
+
+  console.log("⚙️ Setting up Swagger...");
+  let swaggerDocument = {};
+  try {
+    const swaggerPath = path.join(process.cwd(), "swagger-output.json");
+    if (fs.existsSync(swaggerPath)) {
+      const raw = fs.readFileSync(swaggerPath, "utf8");
+      swaggerDocument = JSON.parse(raw);
+
+      if (swaggerDocument.swagger) {
+        delete swaggerDocument.swagger;
+      }
+      console.log("✅ Swagger document loaded");
+    } else {
+      console.warn("⚠️ swagger-output.json not found. Swagger disabled");
+    }
+  } catch (err) {
+    console.warn("⚠️ Swagger setup failed:", err.message);
+  }
+
+  if (Object.keys(swaggerDocument).length > 0) {
+    app.use(
+      "/api-docs",
+      swaggerUi.default.serve,
+      swaggerUi.default.setup(swaggerDocument)
+    );
+  }
+
+  console.log("⚙️ Setting up API routes...");
+  app.use("/api/likes", likeRoutes.default);
+  app.use("/api/pets", petRoutes.default);
+  app.use("/api/posts", postRoutes.default);
+  app.use("/api/auth", authRoutes.default);
+  app.use("/api/users", userRoutes.default);
+  app.use("/api/comments", commentRoutes.default);
+  app.use("/api/follows", followRoutes.default);
+  app.use("/api/reports", reportRoutes.default);
+  app.use("/api/admin", adminRoutes.default);
+  app.use("/api/blocks", blockRoutes.default);
+  app.use("/api/anniversaries", anniversaryRoutes.default);
+  app.use("/api/walks", walkRoutes.default);
+  console.log("✅ All routes configured");
+
+  console.log("⚙️ Setting up error handlers...");
+  app.use((err, req, res, next) => {
+    console.error("❌ Server error:", err);
+    res.status(500).json({
+      message: "서버 에러",
+      error: process.env.NODE_ENV === "development" ? err.message : undefined,
+    });
+  });
+
+  app.use((req, res) => {
+    res.status(404).json({
+      message: "엔드포인트를 찾을 수 없습니다",
+      path: req.originalUrl,
+    });
+  });
+
+  console.log("🚀 Starting server...");
+  const PORT = process.env.PORT || 3000;
+
+  const server = app.listen(PORT, "0.0.0.0", () => {
+    console.log(`✅ Server successfully started on port ${PORT}`);
+    console.log(`🌐 Health check: http://localhost:${PORT}/health`);
+    console.log(`📚 API docs: http://localhost:${PORT}/api-docs`);
+  });
+
+  // Keep the process alive
+  process.on("SIGTERM", () => {
+    console.log("🛑 SIGTERM received. Shutting down gracefully...");
+    server.close(() => {
+      console.log("👋 Server closed");
+    });
+  });
+
+  process.on("SIGINT", () => {
+    console.log("🛑 SIGINT received. Shutting down gracefully...");
+    server.close(() => {
+      console.log("👋 Server closed");
+    });
+  });
+
+  console.log("✅ === APPLICATION FULLY STARTED ===");
+} catch (err) {
+  console.error("❌ === APPLICATION STARTUP FAILED ===");
+  console.error("Error:", err.message);
+  console.error("Stack:", err.stack);
+  process.exit(1);
+}
+
+// Handle unhandled errors
 process.on("uncaughtException", (err) => {
   console.error("❌ Uncaught Exception:", err);
-  gracefulShutdown("UNCAUGHT_EXCEPTION");
+  process.exit(1);
 });
 
 process.on("unhandledRejection", (reason, promise) => {
   console.error("❌ Unhandled Rejection at:", promise, "reason:", reason);
-  gracefulShutdown("UNHANDLED_REJECTION");
-});
-
-// 프로세스 초기화 완료
-process.nextTick(() => {
-  console.log("✅ Process initialization complete");
+  process.exit(1);
 });
