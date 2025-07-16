@@ -13,7 +13,7 @@ export const handleBlockUser = async (req, res) => {
   try {
     // 중복 차단 방지
     await db.query(
-      `INSERT INTO public.blocks (blocker_id, blocked_id)
+      `INSERT INTO blocks (blocker_id, blocked_id)
        VALUES ($1, $2)
        ON CONFLICT DO NOTHING`,
       [blockerId, blockedUserId]
@@ -33,8 +33,8 @@ export const getBlockedUsers = async (req, res) => {
   try {
     const { rows } = await db.query(
       `SELECT u.user_id, u.username, u.profile_image
-       FROM public.blocks b
-       JOIN public.users u ON b.blocked_id = u.user_id
+       FROM blocks b
+       JOIN users u ON b.blocked_id = u.user_id
        WHERE b.blocker_id = $1`,
       [blockerId]
     );
@@ -48,7 +48,7 @@ export const getBlockedUsers = async (req, res) => {
 
 export async function isBlockedBetween(userId1, userId2) {
   const { rows } = await db.query(
-    `SELECT 1 FROM public.blocks 
+    `SELECT 1 FROM blocks 
      WHERE (blocker_id = $1 AND blocked_id = $2) 
         OR (blocker_id = $2 AND blocked_id = $1)`,
     [userId1, userId2]

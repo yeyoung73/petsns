@@ -40,7 +40,7 @@ export async function getAllReports(req, res) {
 export async function deleteReport(req, res) {
   const { id } = req.params;
   try {
-    await db.query("DELETE FROM public.reports WHERE report_id = $1", [id]);
+    await db.query("DELETE FROM reports WHERE report_id = $1", [id]);
     res.json({ message: "신고가 삭제되었습니다." });
   } catch (err) {
     console.error("신고 삭제 실패:", err);
@@ -54,7 +54,7 @@ export const submitReport = async (req, res) => {
 
   try {
     await db.query(
-      `INSERT INTO public.reports (reporter_id, target_type, target_id, reason) VALUES ($1, $2, $3, $4)`,
+      `INSERT INTO reports (reporter_id, target_type, target_id, reason) VALUES ($1, $2, $3, $4)`,
       [reporter_id, target_type, target_id, reason]
     );
 

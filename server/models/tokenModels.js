@@ -5,7 +5,7 @@ import pool from "../config/db.js";
 export async function findEmailToken(token) {
   const { rows } = await pool.query(
     `SELECT id, token, expires_at 
-       FROM public.email_tokens
+       FROM email_tokens
       WHERE token = $1`,
     [token]
   );
@@ -13,14 +13,14 @@ export async function findEmailToken(token) {
 }
 
 export async function deleteEmailToken(id) {
-  await pool.query(`DELETE FROM public.email_tokens WHERE id = $1`, [id]);
+  await pool.query(`DELETE FROM email_tokens WHERE id = $1`, [id]);
 }
 
 // 리프레시 토큰 조회/삭제
 export async function findRefreshToken(token) {
   const { rows } = await pool.query(
     `SELECT id, token, expires_at 
-       FROM public.refresh_tokens
+       FROM refresh_tokens
       WHERE token = $1`,
     [token]
   );
@@ -28,5 +28,5 @@ export async function findRefreshToken(token) {
 }
 
 export async function deleteRefreshToken(id) {
-  await pool.query(`DELETE FROM public.refresh_tokens WHERE id = $1`, [id]);
+  await pool.query(`DELETE FROM refresh_tokens WHERE id = $1`, [id]);
 }

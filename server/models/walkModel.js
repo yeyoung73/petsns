@@ -3,7 +3,7 @@ import db from "../config/db.js";
 // 1. 산책 기록 삽입
 export async function insertWalk({ pet_id, started_at, route, memo }) {
   const result = await db.query(
-    `INSERT INTO public.walks (pet_id, started_at, route, memo)
+    `INSERT INTO walks (pet_id, started_at, route, memo)
      VALUES ($1, $2, $3, $4)
      RETURNING *`,
     [pet_id, started_at, JSON.stringify(route), memo]
@@ -16,7 +16,7 @@ export async function insertWalk({ pet_id, started_at, route, memo }) {
 // 1. 전체 조회
 export async function getWalksByPetId(petId) {
   const result = await db.query(
-    `SELECT * FROM public.walks WHERE pet_id = $1 ORDER BY started_at DESC`,
+    `SELECT * FROM walks WHERE pet_id = $1 ORDER BY started_at DESC`,
     [petId]
   );
 
@@ -28,10 +28,9 @@ export async function getWalksByPetId(petId) {
 
 // 2. 단일 조회
 export async function findWalkById(walkId) {
-  const result = await db.query(
-    `SELECT * FROM public.walks WHERE walk_id = $1`,
-    [walkId]
-  );
+  const result = await db.query(`SELECT * FROM walks WHERE walk_id = $1`, [
+    walkId,
+  ]);
 
   if (result.rows.length === 0) return null;
 
@@ -48,7 +47,7 @@ export async function updateWalkById(walkId, { started_at, route, memo }) {
   if (!existing) return null;
 
   const result = await db.query(
-    `UPDATE public.walks 
+    `UPDATE walks 
      SET started_at = $1, route = $2, memo = $3 
      WHERE walk_id = $4
      RETURNING *`,
@@ -65,7 +64,7 @@ export async function updateWalkById(walkId, { started_at, route, memo }) {
 
 // 5. 산책 기록 삭제
 export async function deleteWalkById(walkId) {
-  const result = await db.query(`DELETE FROM public.walks WHERE walk_id = $1`, [
+  const result = await db.query(`DELETE FROM walks WHERE walk_id = $1`, [
     walkId,
   ]);
 

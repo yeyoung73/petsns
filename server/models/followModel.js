@@ -3,7 +3,7 @@ import db from "../config/db.js";
 // ✅ 팔로우 생성
 export const createFollow = async (followerId, followingId) => {
   const sql = `
-    INSERT INTO public.follows (follower_id, following_id)
+    INSERT INTO follows (follower_id, following_id)
     VALUES ($1, $2)
   `;
   await db.query(sql, [followerId, followingId]);
@@ -12,7 +12,7 @@ export const createFollow = async (followerId, followingId) => {
 // ✅ 팔로우 삭제
 export const deleteFollow = async (followerId, followingId) => {
   const sql = `
-    DELETE FROM public.follows
+    DELETE FROM follows
     WHERE follower_id = $1 AND following_id = $2
   `;
   await db.query(sql, [followerId, followingId]);
@@ -23,7 +23,7 @@ export const isFollowing = async (followerId, followingId) => {
   console.log("🔍 isFollowing:", { followerId, followingId }); // ✅ 확인용 로그
   const sql = `
     SELECT COUNT(*) as count
-    FROM public.follows
+    FROM follows
     WHERE follower_id = $1 AND following_id = $2
   `;
   const result = await db.query(sql, [followerId, followingId]);
@@ -34,7 +34,7 @@ export const isFollowing = async (followerId, followingId) => {
 export const countFollowers = async (userId) => {
   const sql = `
     SELECT COUNT(*) AS count
-    FROM public.follows
+    FROM follows
     WHERE following_id = $1
   `;
   const result = await db.query(sql, [userId]);
@@ -45,7 +45,7 @@ export const countFollowers = async (userId) => {
 export const countFollowing = async (userId) => {
   const sql = `
     SELECT COUNT(*) AS count
-    FROM public.follows
+    FROM follows
     WHERE follower_id = $1
   `;
   const result = await db.query(sql, [userId]);

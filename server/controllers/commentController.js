@@ -31,7 +31,7 @@ export const postComment = async (req, res) => {
   try {
     // 1. 게시글 작성자 가져오기
     const result = await db.query(
-      "SELECT user_id FROM public.posts WHERE post_id = $1",
+      "SELECT user_id FROM posts WHERE post_id = $1",
       [postId]
     );
     const postOwnerId = result.rows[0]?.user_id;
@@ -97,7 +97,7 @@ export async function softDeleteComment(req, res) {
 export async function getPostIdByCommentId(req, res) {
   const { id } = req.params;
   const result = await db.query(
-    `SELECT post_id FROM public.comments WHERE comment_id = $1`,
+    `SELECT post_id FROM comments WHERE comment_id = $1`,
     [id]
   );
 

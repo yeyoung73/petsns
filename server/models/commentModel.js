@@ -61,11 +61,11 @@ export async function getCommentsByPostId(postId, userId) {
       c.content, 
       c.created_at, 
       c.is_deleted
-    FROM public.comments c
-    LEFT JOIN public.users u ON c.user_id = u.user_id
+    FROM comments c
+    LEFT JOIN users u ON c.user_id = u.user_id
     WHERE c.post_id = $1
       AND c.user_id NOT IN (
-        SELECT blocked_id FROM public.blocks WHERE blocker_id = $2
+        SELECT blocked_id FROM blocks WHERE blocker_id = $2
       )
     ORDER BY c.created_at ASC
   `,
@@ -77,7 +77,7 @@ export async function getCommentsByPostId(postId, userId) {
 // 댓글 또는 대댓글 생성
 export const createComment = async ({ postId, userId, parentId, content }) => {
   const query = `
-    INSERT INTO public.comments (post_id, user_id, parent_id, content, created_at)
+    INSERT INTO comments (post_id, user_id, parent_id, content, created_at)
     VALUES ($1, $2, $3, $4, now())
     RETURNING *
   `;
@@ -93,7 +93,7 @@ export const createComment = async ({ postId, userId, parentId, content }) => {
 // 댓글 수정
 export const updateCommentById = async ({ commentId, userId, content }) => {
   const query = `
-    UPDATE public.comments
+    UPDATE comments
     SET content = $1
     WHERE comment_id = $2 AND user_id = $3
   `;
@@ -106,19 +106,19 @@ export async function softDeleteCommentById(commentId) {
   try {
     // 대댓글이 있는지 확인
     const childResult = await client.query(
-      `SELECT 1 FROM public.comments WHERE parent_id = $1 LIMIT 1`,
+      `SELECT 1 FROM comments WHERE parent_id = $1 LIMIT 1`,
       [commentId]
     );
 
     if (childResult.rowCount > 0) {
       // 대댓글이 있으면 소프트 삭제
       await client.query(
-        `UPDATE public.comments SET is_deleted = true WHERE comment_id = $1`,
+        `UPDATE comments SET is_deleted = true WHERE comment_id = $1`,
         [commentId]
       );
     } else {
       // 대댓글이 없으면 하드 삭제
-      await client.query(`DELETE FROM public.comments WHERE comment_id = $1`, [
+      await client.query(`DELETE FROM comments WHERE comment_id = $1`, [
         commentId,
       ]);
     }

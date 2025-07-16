@@ -11,7 +11,7 @@ export async function createPet({
   profileImage,
 }) {
   const result = await db.query(
-    `INSERT INTO public.pets 
+    `INSERT INTO pets 
      (owner_id, name, species, breed, gender, birthday, profile_image)
      VALUES ($1, $2, $3, $4, $5, $6, $7)
      RETURNING *`,
@@ -25,7 +25,7 @@ export async function updatePetById(petId, ownerId, updates) {
   const { name, species, breed, gender, birthday, profileImage } = updates;
 
   const result = await db.query(
-    `UPDATE public.pets
+    `UPDATE pets
      SET name = $1,
          species = $2,
          breed = $3,
@@ -44,7 +44,7 @@ export async function updatePetById(petId, ownerId, updates) {
 // 반려동물 상세 조회
 export async function getPetById(petId, ownerId) {
   const result = await db.query(
-    `SELECT * FROM public.pets WHERE pet_id = $1 AND owner_id = $2`,
+    `SELECT * FROM pets WHERE pet_id = $1 AND owner_id = $2`,
     [petId, ownerId]
   );
   return result.rows[0];
@@ -52,7 +52,7 @@ export async function getPetById(petId, ownerId) {
 
 export async function deletePetById(petId, userId) {
   const result = await db.query(
-    `DELETE FROM public.pets WHERE pet_id = $1 AND owner_id = $2`,
+    `DELETE FROM pets WHERE pet_id = $1 AND owner_id = $2`,
     [petId, userId]
   );
   return result.rowCount > 0; // true면 삭제 성공
