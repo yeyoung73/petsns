@@ -11,9 +11,11 @@ const HomePage: React.FC = () => {
   const [user, setUser] = useState<string>("");
   const [filter, setFilter] = useState<"all" | "follow" | "tag">("all");
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
-  const navigate = useNavigate();
   const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
+  // 초기 인증 및 사용자 정보 설정
   useEffect(() => {
     const token = localStorage.getItem("token");
     const username = localStorage.getItem("username");
@@ -25,46 +27,73 @@ const HomePage: React.FC = () => {
     }
 
     if (username) setUser(username);
-    setIsAdmin(adminFlag); // ✅ isAdmin 상태 업데이트
+    setIsAdmin(adminFlag);
   }, [navigate]);
 
+  // 게시글 불러오기
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-      return;
-    }
-
-    const username = localStorage.getItem("username");
-    if (username) setUser(username);
-  }, [navigate]);
-
-  useEffect(() => {
-    const token = localStorage.getItem("token");
-
     const fetchPosts = async () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
       try {
+        setLoading(true);
         let url = "/api/posts";
-        if (filter === "follow") url = "/api/posts/feed";
-        else if (filter === "tag" && selectedTag)
+
+        if (filter === "follow") {
+          url = "/api/posts/feed";
+        } else if (filter === "tag" && selectedTag) {
           url = `/api/posts/by-tag/${encodeURIComponent(selectedTag)}`;
+        }
+
+        console.log(`📡 API 요청 중: ${url}`);
 
         const res = await fetch(url, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
         });
 
+        console.log(`📊 응답 상태: ${res.status}`);
+
+        if (!res.ok) {
+          if (res.status === 401) {
+            // 토큰이 만료되었거나 유효하지 않음
+            localStorage.removeItem("token");
+            localStorage.removeItem("username");
+            localStorage.removeItem("is_admin");
+            navigate("/login");
+            return;
+          }
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
         const data = await res.json();
-        if (Array.isArray(data)) setPosts(data);
-        else setPosts([]);
+        console.log("📝 받은 게시글 데이터:", data);
+
+        if (Array.isArray(data)) {
+          setPosts(data);
+        } else {
+          console.warn("⚠️ 받은 데이터가 배열이 아닙니다:", data);
+          setPosts([]);
+        }
       } catch (err) {
-        console.error("게시글 불러오기 실패:", err);
+        console.error("❌ 게시글 불러오기 실패:", err);
         setPosts([]);
+      } finally {
+        setLoading(false);
       }
     };
 
     fetchPosts();
-  }, [filter, selectedTag]);
+  }, [filter, selectedTag, navigate]);
 
+  // 다가오는 기념일 확인
   useEffect(() => {
     const fetchUpcoming = async () => {
       try {
@@ -80,18 +109,41 @@ const HomePage: React.FC = () => {
     fetchUpcoming();
   }, []);
 
-  if (!Array.isArray(posts)) {
-    return <p>게시글을 불러올 수 없습니다.</p>;
-  }
-
   const handleLogout = () => {
     if (confirm("로그아웃 하시겠습니까?")) {
       localStorage.removeItem("token");
       localStorage.removeItem("username");
+      localStorage.removeItem("is_admin");
       sessionStorage.removeItem("token");
       navigate("/login");
     }
   };
+
+  if (loading) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>반려동물 피드</h1>
+        </div>
+        <p style={{ textAlign: "center", padding: "20px" }}>
+          게시글을 불러오는 중...
+        </p>
+      </div>
+    );
+  }
+
+  if (!Array.isArray(posts)) {
+    return (
+      <div className={styles.container}>
+        <div className={styles.header}>
+          <h1 className={styles.title}>반려동물 피드</h1>
+        </div>
+        <p style={{ textAlign: "center", padding: "20px" }}>
+          게시글을 불러올 수 없습니다.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className={styles.container}>
@@ -121,7 +173,9 @@ const HomePage: React.FC = () => {
           </button>
         </div>
       </div>
+
       <UpcomingAnniversaryList />
+
       <div className={styles.menu}>
         <Link
           to="/pets"
@@ -171,6 +225,7 @@ const HomePage: React.FC = () => {
           팔로우한 유저
         </button>
       </div>
+
       {selectedTag && filter === "tag" && (
         <div className={styles.tagFilterNotice}>
           <span>

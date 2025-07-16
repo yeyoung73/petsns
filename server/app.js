@@ -296,6 +296,10 @@ try {
   app.use("/api/auth", authRoutes.default);
   app.use("/api/users", userRoutes.default);
   app.use("/api/posts", postRoutes.default);
+  app.use("/api/posts", (req, res, next) => {
+    console.log("📝 Posts API 요청:", req.method, req.url);
+    next();
+  });
   app.use("/api/comments", commentRoutes.default);
   app.use("/api/likes", likeRoutes.default);
   app.use("/api/follows", followRoutes.default);
