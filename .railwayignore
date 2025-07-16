@@ -1,2 +1,4 @@
-Dockerfile
 server/
+dockerfile
+tsconfig.node.json
+tsconfig.app.json
