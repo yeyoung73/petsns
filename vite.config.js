@@ -21,13 +21,11 @@ export default defineConfig({
   preview: {
     port: 3000,
     host: "0.0.0.0",
+    historyApiFallback: true,
   },
   define: {
     "import.meta.env.VITE_API_URL": JSON.stringify(
       process.env.VITE_API_URL || "https://petsns-production.up.railway.app"
     ),
-  },
-  server: {
-    historyApiFallback: true, // 개발 서버용
   },
 });
