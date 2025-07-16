@@ -8,11 +8,11 @@ import pkg from "pg";
 const { Pool } = pkg;
 
 console.log("📊 Database environment variables:");
-console.log("  PGHOST:", process.env.PGHOST ? "✅ Set" : "❌ Missing");
-console.log("  PGDATABASE:", process.env.PGDATABASE ? "✅ Set" : "❌ Missing");
-console.log("  PGUSER:", process.env.PGUSER ? "✅ Set" : "❌ Missing");
-console.log("  PGPASSWORD:", process.env.PGPASSWORD ? "✅ Set" : "❌ Missing");
-console.log("  PGPORT:", process.env.PGPORT || 5432);
+console.log("  PGHOST:", process.env.DB_HOST ? "✅ Set" : "❌ Missing");
+console.log("  PGDATABASE:", process.env.DB_DATABASE ? "✅ Set" : "❌ Missing");
+console.log("  PGUSER:", process.env.DB_USER ? "✅ Set" : "❌ Missing");
+console.log("  PGPASSWORD:", process.env.DB_PASSWORD ? "✅ Set" : "❌ Missing");
+console.log("  PGPORT:", process.env.DB_PORT || 5432);
 
 // 날짜 파싱 (1082: date 타입)
 pkg.types.setTypeParser(1082, (val) => val);
@@ -22,11 +22,11 @@ let pool;
 try {
   // 연결 풀 생성
   pool = new Pool({
-    host: process.env.PGHOST,
-    port: process.env.PGPORT || 5432,
-    database: process.env.PGDATABASE,
-    user: process.env.PGUSER,
-    password: process.env.PGPASSWORD,
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_DATABASE,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
     ssl:
       process.env.NODE_ENV === "production"
         ? { rejectUnauthorized: false }
