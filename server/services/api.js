@@ -38,34 +38,18 @@ export async function fetchFollowedPosts(token) {
   if (!response.ok) throw new Error("팔로우 피드 요청 실패");
   return await response.json();
 }
+// 임시 하드코딩 (테스트용)
+const API_BASE_URL = "https://petsns-production.up.railway.app";
 
-// 환경별 API URL 설정
-const getApiUrl = () => {
-  // Vite 환경변수 확인
-  if (import.meta.env.VITE_API_URL) {
-    return import.meta.env.VITE_API_URL;
-  }
-
-  // React 환경변수 확인 (Create React App)
-  if (process.env.REACT_APP_API_URL) {
-    return process.env.REACT_APP_API_URL;
-  }
-
-  // 개발 환경 기본값
-  return "http://localhost:3001";
-};
-
-const API_BASE_URL = getApiUrl();
-
-console.log("🌐 API Base URL:", API_BASE_URL); // 디버깅용
+console.log("🌐 API Base URL (하드코딩):", API_BASE_URL);
 
 const api = axios.create({
   baseURL: API_BASE_URL,
   withCredentials: true,
-  timeout: 10000, // 10초 타임아웃
+  timeout: 10000,
 });
 
-// 요청 인터셉터 (디버깅용)
+// 요청 인터셉터
 api.interceptors.request.use(
   (config) => {
     console.log("📤 API 요청:", {
@@ -78,27 +62,6 @@ api.interceptors.request.use(
   },
   (error) => {
     console.error("❌ API 요청 에러:", error);
-    return Promise.reject(error);
-  }
-);
-
-// 응답 인터셉터 (디버깅용)
-api.interceptors.response.use(
-  (response) => {
-    console.log("📥 API 응답 성공:", {
-      status: response.status,
-      url: response.config.url,
-      data: response.data,
-    });
-    return response;
-  },
-  (error) => {
-    console.error("📥 API 응답 에러:", {
-      status: error.response?.status,
-      url: error.config?.url,
-      message: error.message,
-      data: error.response?.data,
-    });
     return Promise.reject(error);
   }
 );
