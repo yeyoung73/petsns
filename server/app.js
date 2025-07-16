@@ -247,6 +247,10 @@ try {
   app.use("/api/walks", walkRoutes.default);
   console.log("✅ All routes configured");
 
+  app.get("/health", (req, res) => {
+    res.status(200).json({ status: "OK" });
+  });
+
   console.log("⚙️ Setting up error handlers...");
   app.use((err, req, res, next) => {
     console.error("❌ Server error:", err);
