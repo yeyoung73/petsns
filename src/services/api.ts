@@ -6,7 +6,10 @@ import type {
   AxiosResponse,
 } from "axios";
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+// 🔥 임시 하드코딩 - 모든 환경에서 Railway URL 사용
+const API_BASE_URL = "https://petsns-production.up.railway.app";
+
+console.log("🌐 API Base URL (services):", API_BASE_URL);
 
 // 타입 정의
 interface PetData {
@@ -54,6 +57,8 @@ interface TokenPayload {
 // Axios 인스턴스 생성
 const api: AxiosInstance = axios.create({
   baseURL: API_BASE_URL,
+  withCredentials: true,
+  timeout: 15000,
   headers: {
     "Content-Type": "application/json",
   },
@@ -68,9 +73,11 @@ api.interceptors.request.use(
     }
 
     // 요청 로깅
-    console.log("API 요청:", {
+    console.log("📤 API 요청:", {
       method: config.method?.toUpperCase(),
       url: config.url,
+      baseURL: config.baseURL,
+      fullURL: `${config.baseURL}${config.url}`,
       headers: config.headers,
       data: config.data,
     });
@@ -78,7 +85,7 @@ api.interceptors.request.use(
     return config;
   },
   (error: any) => {
-    console.error("요청 인터셉터 에러:", error);
+    console.error("❌ 요청 인터셉터 에러:", error);
     return Promise.reject(error);
   }
 );
@@ -86,7 +93,7 @@ api.interceptors.request.use(
 // 응답 인터셉터 - 에러 처리
 api.interceptors.response.use(
   (response: AxiosResponse) => {
-    console.log("API 응답 성공:", {
+    console.log("✅ API 응답 성공:", {
       status: response.status,
       url: response.config.url,
       data: response.data,
@@ -94,7 +101,7 @@ api.interceptors.response.use(
     return response;
   },
   (error: any) => {
-    console.error("API 응답 에러:", {
+    console.error("❌ API 응답 에러:", {
       status: error.response?.status,
       url: error.config?.url,
       message:
@@ -103,6 +110,13 @@ api.interceptors.response.use(
         error.message,
       data: error.response?.data,
     });
+
+    // HTML 응답 감지
+    if (error.message.includes("Unexpected token")) {
+      console.error(
+        "🚨 서버에서 HTML을 반환했습니다. API 엔드포인트를 확인하세요!"
+      );
+    }
 
     // 토큰 만료 또는 인증 실패
     if (error.response?.status === 401) {
@@ -211,9 +225,10 @@ export const authUtils = {
   },
 };
 
+// 🔥 수정: 기념일 API들도 올바른 axios 인스턴스 사용
 // 기념일 목록 가져오기
 export const fetchAnniversaries = async (petId: number) => {
-  const res = await axios.get(`/api/anniversaries/pets/${petId}`);
+  const res = await api.get(`/api/anniversaries/pets/${petId}`);
   return res.data;
 };
 
@@ -225,13 +240,13 @@ export const createAnniversary = async (data: {
   memo?: string;
   image?: string;
 }) => {
-  const res = await axios.post(`/api/anniversaries`, data);
+  const res = await api.post(`/api/anniversaries`, data);
   return res.data;
 };
 
 // 기념일 삭제
 export const deleteAnniversary = async (anniversaryId: number) => {
-  await axios.delete(`/api/anniversaries/${anniversaryId}`);
+  await api.delete(`/api/anniversaries/${anniversaryId}`);
 };
 
 export default api;
