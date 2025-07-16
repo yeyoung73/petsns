@@ -30,46 +30,6 @@ const HomePage: React.FC = () => {
     setIsAdmin(adminFlag);
   }, [navigate]);
 
-  useEffect(() => {
-    const testBothMethods = async () => {
-      const token = localStorage.getItem("token");
-
-      if (!token) {
-        navigate("/login");
-        return;
-      }
-
-      try {
-        console.log("🔍 fetch 방식 테스트");
-        const fetchRes = await fetch(
-          "https://petsns-production.up.railway.app/api/posts",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        console.log("📊 fetch 응답 상태:", fetchRes.status);
-        console.log("📊 fetch 응답 헤더:", [...fetchRes.headers.entries()]);
-
-        const fetchText = await fetchRes.text();
-        console.log(
-          "📄 fetch 응답 내용 (처음 200자):",
-          fetchText.substring(0, 200)
-        );
-
-        console.log("🔍 axios 방식 테스트");
-        const axiosRes = await api.get("/api/posts");
-        console.log("📊 axios 응답:", axiosRes.data);
-      } catch (err) {
-        console.error("❌ 테스트 실패:", err);
-      }
-    };
-
-    testBothMethods();
-  }, [navigate]);
   // 게시글 불러오기
   useEffect(() => {
     const fetchPosts = async () => {
@@ -92,38 +52,31 @@ const HomePage: React.FC = () => {
 
         console.log(`📡 API 요청 중: ${url}`);
 
-        const res = await fetch(url, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        });
+        // fetch 대신 api 인스턴스 사용 (기념일 API처럼)
+        const res = await api.get(url);
 
-        console.log(`📊 응답 상태: ${res.status}`);
+        console.log(`📊 응답 상태: 성공`);
+        console.log("📝 받은 게시글 데이터:", res.data);
 
-        if (!res.ok) {
-          if (res.status === 401) {
-            // 토큰이 만료되었거나 유효하지 않음
-            localStorage.removeItem("token");
-            localStorage.removeItem("username");
-            localStorage.removeItem("is_admin");
-            navigate("/login");
-            return;
-          }
-          throw new Error(`HTTP error! status: ${res.status}`);
-        }
-
-        const data = await res.json();
-        console.log("📝 받은 게시글 데이터:", data);
-
-        if (Array.isArray(data)) {
-          setPosts(data);
+        if (Array.isArray(res.data)) {
+          setPosts(res.data);
         } else {
-          console.warn("⚠️ 받은 데이터가 배열이 아닙니다:", data);
+          console.warn("⚠️ 받은 데이터가 배열이 아닙니다:", res.data);
           setPosts([]);
         }
       } catch (err) {
         console.error("❌ 게시글 불러오기 실패:", err);
+
+        // axios 에러 처리
+        if (err.response?.status === 401) {
+          // 토큰이 만료되었거나 유효하지 않음
+          localStorage.removeItem("token");
+          localStorage.removeItem("username");
+          localStorage.removeItem("is_admin");
+          navigate("/login");
+          return;
+        }
+
         setPosts([]);
       } finally {
         setLoading(false);
