@@ -30,6 +30,46 @@ const HomePage: React.FC = () => {
     setIsAdmin(adminFlag);
   }, [navigate]);
 
+  useEffect(() => {
+    const testBothMethods = async () => {
+      const token = localStorage.getItem("token");
+
+      if (!token) {
+        navigate("/login");
+        return;
+      }
+
+      try {
+        console.log("🔍 fetch 방식 테스트");
+        const fetchRes = await fetch(
+          "https://petsns-production.up.railway.app/api/posts",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        console.log("📊 fetch 응답 상태:", fetchRes.status);
+        console.log("📊 fetch 응답 헤더:", [...fetchRes.headers.entries()]);
+
+        const fetchText = await fetchRes.text();
+        console.log(
+          "📄 fetch 응답 내용 (처음 200자):",
+          fetchText.substring(0, 200)
+        );
+
+        console.log("🔍 axios 방식 테스트");
+        const axiosRes = await api.get("/api/posts");
+        console.log("📊 axios 응답:", axiosRes.data);
+      } catch (err) {
+        console.error("❌ 테스트 실패:", err);
+      }
+    };
+
+    testBothMethods();
+  }, [navigate]);
   // 게시글 불러오기
   useEffect(() => {
     const fetchPosts = async () => {
